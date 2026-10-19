@@ -1,0 +1,123 @@
+/* Página pública con el estilo de las piezas impresas de la Facultad:
+   papel crema, serif itálica, reglas finas, números azules y una mancha roja de crayón.
+   Solo modo claro, igual que el material impreso. */
+:root {
+  color-scheme: light;
+  --accent: #2347c5;
+  --lic: #2347c5;        /* color de la licenciatura (lo pone la página) */
+  --lic-ink: #2347c5;    /* versión legible del mismo color sobre el papel */
+  --paper: #f7f4ec;
+  --ink: #141414;
+  --ink-2: #4d4a43;
+  --ink-3: #7d786d;
+  --rule: #1a1a1a;
+  --red: #d8382d;
+  --blue: #2347c5;
+  --green: #12a95a;
+  --yellow: #e9a63a;
+  --pink: #f4c3cb;
+  --serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+html { background: var(--paper); }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.45 var(--sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* mancha roja de crayón, como en los afiches */
+.blob-wrap { position: absolute; top: 0; left: 0; right: 0; height: 280px; overflow: hidden; pointer-events: none; z-index: 0; }
+.blob {
+  position: absolute; top: -95px; right: -85px; width: 200px; height: 200px;
+  fill: var(--red); pointer-events: none; z-index: 0;
+}
+@media (min-width: 700px) { .blob { width: 340px; height: 340px; top: -130px; right: -110px; } .hub { padding-top: 120px; } }
+
+.hub {
+  position: relative; z-index: 1;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 112px 20px 28px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ---------- encabezado ---------- */
+.hub-head { margin-bottom: 32px; }
+.avatar {
+  width: 76px; height: 76px; margin-bottom: 22px;
+  border-radius: 50%; overflow: hidden; background: #fff;
+  box-shadow: 0 0 0 1px rgba(20, 20, 20, .08);
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.eyebrow {
+  margin: 0 0 10px; font: 600 12px/1.3 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
+}
+.hub-head h1 em { display: block; font-style: italic; color: var(--lic-ink); }
+.hub-head h1 {
+  font-family: var(--serif); font-weight: 600;
+  font-size: clamp(38px, 11vw, 56px); line-height: .98; letter-spacing: -.035em;
+  margin: 0 0 14px; text-wrap: balance;
+  font-variation-settings: "opsz" 144;
+}
+.hub-head .subtitle {
+  margin: 0; font-family: var(--serif); font-style: italic; font-weight: 500;
+  font-size: 22px; line-height: 1.2; color: var(--ink-2); letter-spacing: -.01em;
+}
+
+/* ---------- lista de enlaces (como el listado numerado del afiche) ---------- */
+.links { display: flex; flex-direction: column; border-top: 1.5px solid var(--rule); counter-reset: n; }
+.link {
+  position: relative;
+  display: flex; align-items: center; gap: 14px;
+  min-height: 68px; padding: 14px 6px 14px 2px;
+  border-bottom: 1.5px solid var(--rule);
+  color: var(--ink); text-decoration: none;
+  font-family: var(--serif); font-size: 21px; font-weight: 500; line-height: 1.2; letter-spacing: -.01em;
+  transition: background-color .15s ease, padding .15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.link::before {
+  counter-increment: n; content: counter(n, decimal-leading-zero);
+  font-family: var(--serif); font-style: italic; font-weight: 600; font-size: 24px;
+  color: var(--n, var(--lic-ink)); min-width: 34px;
+}
+.link .icon { font-size: 20px; line-height: 1; }
+.link .label { flex: 1; min-width: 0; }
+.link .arrow {
+  flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+  font-family: var(--sans); font-size: 17px; color: var(--ink);
+  border: 1.5px solid var(--rule); transition: background-color .15s ease, color .15s ease, transform .15s ease;
+}
+.link:hover, .link:focus-visible { background: color-mix(in srgb, var(--lic) 16%, transparent); padding-left: 10px; outline: none; }
+.link:hover .arrow, .link:focus-visible .arrow { background: var(--n, var(--lic-ink)); border-color: var(--n, var(--lic-ink)); color: #fff; transform: translateX(2px); }
+.link:focus-visible { box-shadow: inset 0 0 0 2px var(--lic-ink); }
+.link:active { background: color-mix(in srgb, var(--lic) 28%, transparent); }
+.link .dot { width: 14px; height: 14px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08); }
+.facts { margin: 16px 0 0; font: italic 600 17px var(--serif); color: var(--lic-ink); letter-spacing: -.005em; }
+
+.redirect {
+  font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--ink-2);
+  border-top: 1.5px solid var(--rule); border-bottom: 1.5px solid var(--rule); padding: 20px 2px; margin: 0;
+}
+
+/* ---------- formas de color (las ilustraciones del folleto) ---------- */
+.shapes { display: flex; gap: 8px; margin: 0 0 18px; height: 46px; }
+.shapes i { flex: 1; display: block; }
+.shapes .s1 { background: var(--red); border-radius: 999px 999px 0 0; }
+.shapes .s2 { background: var(--blue); }
+.shapes .s3 { background: var(--pink); border-radius: 999px; }
+.shapes .s4 { background: var(--yellow); border-radius: 999px 999px 0 0; }
+.shapes .s5 { background: var(--green); border-radius: 0 0 0 0; }
+
+.hub-foot { margin-top: auto; padding-top: 48px; }
+.hub-foot p { font-size: 12px; line-height: 1.5; color: var(--ink-3); margin: 0; max-width: 460px; }

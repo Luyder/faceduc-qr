@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Enlaces</title>
+  <meta name="color-scheme" content="light only">
+  <meta name="theme-color" content="#f7f4ec">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/hub.css?v=20261019h">
+  <script src="config.js?v=20261019h"></script>
+  <script>
+    // ?preview=1 → vista previa dentro del editor: no registra visitas ni abre enlaces
+    window.QRHUB_PREVIEW = /[?&]preview=1\b/.test(location.search);
+  </script>
+</head>
+<body>
+  <div class="blob-wrap" aria-hidden="true">
+  <svg class="blob" viewBox="0 0 200 200">
+    <defs>
+      <filter id="crayon"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2"/><feDisplacementMap in="SourceGraphic" scale="9"/></filter>
+    </defs>
+    <circle cx="100" cy="100" r="86" filter="url(#crayon)"/>
+  </svg>
+  </div>
+  <main class="hub">
+    <header class="hub-head">
+      <div class="avatar" id="avatar" aria-hidden="true"></div>
+      <p class="eyebrow" id="eyebrow"></p>
+      <h1 id="title"></h1>
+      <p class="subtitle" id="subtitle"></p>
+    </header>
+
+    <nav class="links" id="links" aria-label="Enlaces"></nav>
+
+    <p class="redirect" id="redirect" hidden></p>
+    <p class="facts" id="facts" hidden></p>
+
+    <footer class="hub-foot">
+      <div class="shapes" aria-hidden="true"><i class="s1"></i><i class="s2"></i><i class="s3"></i><i class="s4"></i><i class="s5"></i></div>
+      <p id="privacy"></p>
+    </footer>
+  </main>
+
+  <script src="assets/nodes.js?v=20261019h"></script>
+  <script src="assets/tracker.js?v=20261019h"></script>
+  <script>
+    /* Respaldo fijo: si config.js se borra o queda con un error al editarlo,
+       la página no queda en blanco y los QR impresos siguen llevando a algún lugar. */
+    var FALLBACK = { title: "Facultad de Educación", label: "Ir al sitio de la Facultad", url: "https://educacion.uniandes.edu.co" };
+
+    (function () {
+      var nav = document.getElementById("links");
+      var N = window.QRNodes;
+      var URL_OK = /^(https?:|mailto:|tel:)/i;
+
+      function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+
+      function button(l, href) {
+        var a = el("a", "link");
+        a.href = href || l.url;
+        if (!href) a.rel = "noopener";
+        if (l.dot) { var d = el("span", "dot"); d.style.background = l.dot; d.setAttribute("aria-hidden", "true"); a.appendChild(d); }
+        if (l.icon) { var i = el("span", "icon", l.icon); i.setAttribute("aria-hidden", "true"); a.appendChild(i); }
+        a.appendChild(el("span", "label", l.label || l.url));
+        var ar = el("span", "arrow", "→"); ar.setAttribute("aria-hidden", "true");
+        a.appendChild(ar);
+        if (l.ink) a.style.setProperty("--n", l.ink);
+        return a;
+      }
+
+      function setColors(brand) {
+        var root = document.documentElement.style;
+        root.setProperty("--lic", brand);
+        root.setProperty("--lic-ink", N ? N.ink(brand, 3) : brand);
+      }
+
+      // misma página con otra licenciatura, conservando ?src, ?to y la campaña
+      function hrefFor(programId) {
+        var q = new URLSearchParams(location.search);
+        q.set("lic", programId);
+        q.delete("preview");
+        return location.pathname + "?" + q.toString();
+      }
+
+      function render(C, lic) {
+        var broken = !C || !Array.isArray(C.links);
+        if (broken) C = { title: FALLBACK.title, links: [] };
+        var programs = C.programs || [];
+        var program = N && lic ? N.program(C, lic) : null;
+        var chooser = !broken && !program && programs.length > 0;
+
+        setColors(program && program.color ? program.color : (C.accent || "#2347c5"));
+        document.getElementById("privacy").textContent = C.privacyNote || "";
+
+        var av = document.getElementById("avatar");
+        av.textContent = "";
+        av.hidden = !C.avatar;   // sin logo, el título lleva todo el peso, como en el afiche
+        if (C.avatar) { var img = el("img"); img.src = C.avatar; img.alt = ""; av.appendChild(img); }
+
+        var h1 = document.getElementById("title"), eb = document.getElementById("eyebrow"), sub = document.getElementById("subtitle");
+        h1.textContent = "";
+        if (program) {
+          // como la portada del folleto: «Licenciatura» + «en Artes» en el color de la licenciatura
+          h1.appendChild(document.createTextNode("Licenciatura "));
+          h1.appendChild(el("em", null, "en " + program.name));
+          eb.textContent = C.title || "";
+          sub.textContent = C.subtitle || "";
+          document.title = "Licenciatura en " + program.name;
+        } else if (chooser) {
+          h1.appendChild(document.createTextNode("Licenciaturas"));
+          eb.textContent = C.title || "";
+          sub.textContent = "¿Cuál te interesa?";
+          document.title = C.title || "Licenciaturas";
+        } else {
+          h1.textContent = C.title || "";
+          eb.textContent = "";
+          sub.textContent = broken ? "" : (C.subtitle || "");
+          document.title = C.title || "Enlaces";
+        }
+        eb.hidden = !eb.textContent;
+
+        var facts = document.getElementById("facts");
+        var f = program ? [program.semesters && program.semesters + " semestres", program.credits && program.credits + " créditos", program.snies && "SNIES " + program.snies].filter(Boolean) : [];
+        facts.textContent = f.join(" · ");
+        facts.hidden = !f.length;
+
+        nav.textContent = "";
+        var shown = 0;
+        if (chooser) {
+          programs.forEach(function (p) {
+            var a = button({ label: p.name, dot: p.color, ink: N ? N.ink(p.color || "#2347c5", 3) : p.color }, hrefFor(p.id));
+            a.addEventListener("click", function (e) {
+              if (window.QRHUB_PREVIEW) { e.preventDefault(); render(C, p.id); }
+            });
+            nav.appendChild(a); shown++;
+          });
+        } else {
+          var list = N ? N.linksFor(C, program) : C.links.filter(function (l) { return l && !l.hidden && URL_OK.test(l.url || ""); });
+          list.forEach(function (l) {
+            var a = button(l);
+            // click izquierdo, medio (auxclick) y teclado registran la salida
+            a.addEventListener("click", function (e) {
+              if (window.QRHUB_PREVIEW) { e.preventDefault(); return; }
+              if (window.QRHub) QRHub.trackClick(l);
+            });
+            a.addEventListener("auxclick", function (e) { if (e.button === 1 && window.QRHub && !window.QRHUB_PREVIEW) QRHub.trackClick(l); });
+            nav.appendChild(a); shown++;
+          });
+        }
+        if (!shown) nav.appendChild(button(FALLBACK));
+      }
+
+      var lic = new URLSearchParams(location.search).get("lic") || "";
+      render(window.HUB_CONFIG, lic);
+
+      if (window.QRHUB_PREVIEW) {
+        // el editor envía el borrador (y la licenciatura a mostrar) para verlo en vivo
+        window.addEventListener("message", function (e) {
+          if (e.origin === location.origin && e.data && e.data.type === "qrhub-config") render(e.data.config, e.data.lic || "");
+        });
+        if (window.parent !== window) window.parent.postMessage({ type: "qrhub-preview-ready" }, location.origin);
+        return;
+      }
+
+      if (window.QRHub) QRHub.start(function (direct) {
+        nav.hidden = true;
+        var r = document.getElementById("redirect");
+        r.hidden = false;
+        r.textContent = "Redirigiendo a " + (direct.label || "tu destino") + "…";
+      });
+    })();
+  </script>
+</body>
+</html>

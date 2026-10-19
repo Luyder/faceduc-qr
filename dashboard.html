@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Panel QR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="assets/dashboard.css?v=20261019i">
+  <script src="config.js?v=20261019h"></script>
+  <script src="assets/nodes.js?v=20261019h"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <svg class="blob" viewBox="0 0 200 200" aria-hidden="true">
+      <defs>
+        <filter id="crayon"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="9"/></filter>
+      </defs>
+      <circle cx="100" cy="100" r="86" filter="url(#crayon)"/>
+    </svg>
+    <div class="masthead-inner">
+      <div>
+        <p class="eyebrow" id="hubName">Nodo QR</p>
+        <h1>¿Por dónde <em>entran</em> y a dónde <em>van</em>?</h1>
+      </div>
+      <nav class="tabs" role="tablist">
+        <button role="tab" class="tab is-on" data-tab="analytics" aria-selected="true">Analítica</button>
+        <button role="tab" class="tab" data-tab="qr" aria-selected="false">Generar QR</button>
+        <button role="tab" class="tab" data-tab="config" aria-selected="false">Configurar</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ================= ANALÍTICA ================= -->
+    <section id="tab-analytics">
+      <div class="banner" id="healthBanner" role="status" hidden></div>
+      <div class="connect" id="connect">
+        <label class="field grow">
+          <span>Clave de lectura (ADMIN_KEY)</span>
+          <input type="password" id="key" autocomplete="off" placeholder="La que definiste en Apps Script">
+        </label>
+        <label class="check"><input type="checkbox" id="remember"> Recordar aquí</label>
+        <button class="btn primary" id="loadRemote">Cargar datos</button>
+        <span class="divider" aria-hidden="true"></span>
+        <button class="btn ghost" id="loadLocal">Datos de prueba</button>
+        <button class="btn ghost" id="loadDemo">Ver demo</button>
+        <p class="status" id="status">Sin datos cargados.</p>
+      </div>
+
+      <div id="dash" hidden>
+        <div class="filters">
+          <label class="field"><span>Periodo</span>
+            <select id="fRange">
+              <option value="1">Hoy</option>
+              <option value="7">Últimos 7 días</option>
+              <option value="30" selected>Últimos 30 días</option>
+              <option value="90">Últimos 90 días</option>
+              <option value="all">Todo</option>
+            </select>
+          </label>
+          <label class="field"><span>Licenciatura</span><select id="fLic"></select></label>
+          <label class="field"><span>Origen (QR)</span><select id="fSrc"></select></label>
+          <label class="field"><span>Dispositivo</span><select id="fDev"></select></label>
+          <span class="spacer"></span>
+          <button class="btn ghost" id="refresh" title="Volver a descargar">↻ Actualizar</button>
+          <button class="btn ghost" id="csv">Exportar CSV</button>
+        </div>
+
+        <section class="block">
+          <header class="sec"><span class="num">01</span><h2>Resumen</h2></header>
+          <div class="kpis" id="kpis"></div>
+        </section>
+
+        <section class="block">
+          <header class="sec"><span class="num">02</span><h2>Licenciaturas</h2>
+            <p class="sec-hint">Cada licenciatura es un nodo propio. Toca una fila para filtrar todo el panel.</p></header>
+          <div class="card flush"><div class="table-wrap"><table class="data" id="licTable"></table></div></div>
+        </section>
+
+        <section class="block">
+          <header class="sec"><span class="num">03</span><h2>Orígenes del QR</h2>
+            <p class="sec-hint">Cada pieza impresa o digital. Toca una para ver su vista previa y su detalle.</p></header>
+          <div class="origins" id="origins"></div>
+          <details class="more">
+            <summary>Ver como tabla</summary>
+            <div class="table-wrap"><table class="data" id="srcTable"></table></div>
+          </details>
+        </section>
+
+        <section class="block">
+          <header class="sec"><span class="num">04</span><h2>Tendencia diaria</h2></header>
+          <div class="card">
+            <div class="legend" id="lineLegend"></div>
+            <div class="chart-box"><canvas id="lineChart" aria-label="Sesiones y clics por día" role="img"></canvas></div>
+          </div>
+        </section>
+
+        <section class="block">
+          <header class="sec"><span class="num">05</span><h2>Salidas por enlace</h2>
+            <p class="sec-hint">A dónde se van las personas y cuánto tardan en decidir.</p></header>
+          <div class="card flush"><div class="table-wrap"><table class="data" id="linkTable"></table></div></div>
+        </section>
+
+        <section class="block">
+          <header class="sec"><span class="num">06</span><h2>Flujo: origen → salida</h2>
+            <p class="sec-hint">% de sesiones de cada origen que terminan en cada enlace. La última columna son abandonos.</p></header>
+          <div class="card"><div class="table-wrap"><table class="heat" id="flow"></table></div></div>
+        </section>
+
+        <section class="block">
+          <header class="sec"><span class="num">07</span><h2>¿Cuándo escanean?</h2>
+            <p class="sec-hint">Sesiones por día y hora (hora local de este navegador).</p></header>
+          <div class="card"><div class="table-wrap"><table class="heat hours" id="hours"></table></div></div>
+        </section>
+
+        <section class="block">
+          <header class="sec"><span class="num">08</span><h2>Audiencia</h2></header>
+          <div class="grid">
+            <article class="card"><h3>Tiempo en la página</h3><div class="bars" id="dwell"></div></article>
+            <article class="card"><h3>Dispositivo</h3><div class="bars" id="device"></div></article>
+            <article class="card"><h3>Sistema operativo</h3><div class="bars" id="os"></div></article>
+            <article class="card"><h3>Navegador / app</h3><div class="bars" id="browser"></div></article>
+            <article class="card"><h3>Idioma</h3><div class="bars" id="lang"></div></article>
+            <article class="card"><h3>Ubicación</h3><div class="bars" id="geo"></div></article>
+          </div>
+        </section>
+
+        <section class="block">
+          <header class="sec"><span class="num">09</span><h2>Últimos eventos</h2></header>
+          <div class="card flush"><div class="table-wrap tall"><table class="data compact" id="recent"></table></div></div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ================= GENERADOR QR ================= -->
+    <section id="tab-qr" hidden>
+      <section class="block">
+        <header class="sec"><span class="num">01</span><h2>Crear un QR rastreable</h2></header>
+        <div class="card qr-layout">
+          <div class="qr-form">
+            <label class="field"><span>URL pública del nodo</span>
+              <input id="qBase" type="url" placeholder="https://usuario.github.io/repo/">
+            </label>
+            <label class="field"><span>Licenciatura</span><select id="qLic"></select></label>
+            <label class="field"><span>Origen (dónde irá el QR)</span><select id="qSrc"></select></label>
+            <label class="field" id="qCustomWrap" hidden><span>ID personalizado (sin espacios)</span>
+              <input id="qCustom" placeholder="ej. afiche-cafeteria">
+              <small class="hint">Antes de imprimirlo, agrégalo a <code>sources</code> en config.js para verlo con nombre e imagen.</small>
+            </label>
+            <label class="field"><span>Destino</span><select id="qTo"></select></label>
+            <label class="field"><span>Campaña (opcional)</span>
+              <input id="qCamp" placeholder="ej. semestre-2026-2">
+            </label>
+            <label class="field"><span>URL resultante</span>
+              <div class="copy"><input id="qUrl" readonly><button class="btn" id="qCopy">Copiar</button></div>
+            </label>
+          </div>
+
+          <figure class="origin-preview">
+            <figcaption>Vista previa del origen</figcaption>
+            <div class="op-frame" id="qOrigin"></div>
+            <label class="btn ghost small file-btn">Probar otra imagen
+              <input type="file" id="qImg" accept="image/*">
+            </label>
+            <p class="hint" id="qImgHint"></p>
+          </figure>
+
+          <div class="qr-preview">
+            <div id="qrBox" class="qrbox"></div>
+            <p class="qr-cap" id="qCaption"></p>
+            <button class="btn primary" id="qDownload">Descargar PNG</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <header class="sec"><span class="num">02</span><h2>¿Los QR están a salvo?</h2>
+          <p class="sec-hint">Revisión automática de <code>config.js</code>: detecta cambios que podrían romper un QR ya impreso.</p></header>
+        <div class="card"><ul class="health" id="health"></ul></div>
+      </section>
+
+      <section class="block">
+        <header class="sec"><span class="num">03</span><h2>Todos los orígenes</h2>
+          <p class="sec-hint">Un QR por cada origen de <code>config.js</code>, apuntando al nodo divisor.</p></header>
+        <div class="filters qr-all-filter"><label class="field"><span>Licenciatura</span><select id="qAllLic"></select></label></div>
+        <div class="qr-grid" id="qrAll"></div>
+      </section>
+    </section>
+    <!-- ================= CONFIGURAR ================= -->
+    <section id="tab-config" hidden>
+      <div class="ed-layout">
+        <div class="ed-main">
+          <section class="block">
+            <header class="sec"><span class="num">01</span><h2>Página pública</h2>
+              <p class="sec-hint">Todo lo de esta sección se puede cambiar sin afectar los QR.</p></header>
+            <div class="card ed-fields" id="edGeneral"></div>
+          </section>
+
+          <section class="block">
+            <header class="sec"><span class="num">02</span><h2>Licenciaturas</h2>
+              <p class="sec-hint">Cada una es un nodo propio (?lic=id). Su color, pensum y mensaje de WhatsApp se usan en su página.</p></header>
+            <div class="card ed-fields" id="edWhatsapp"></div>
+            <div class="ed-list" id="edPrograms"></div>
+            <button class="btn" id="edAddProgram" type="button">+ Agregar licenciatura</button>
+          </section>
+
+          <section class="block">
+            <header class="sec"><span class="num">03</span><h2>Botones</h2>
+              <p class="sec-hint">Cambia textos y destinos libremente. El id 🔒 queda fijo porque puede estar en un QR directo.</p></header>
+            <div class="ed-list" id="edLinks"></div>
+            <button class="btn" id="edAddLink" type="button">+ Agregar botón</button>
+          </section>
+
+          <section class="block">
+            <header class="sec"><span class="num">04</span><h2>Orígenes del QR</h2>
+              <p class="sec-hint">Cada pieza donde va un QR. Sube su imagen para verla en el panel.</p></header>
+            <div class="ed-list" id="edSources"></div>
+            <button class="btn" id="edAddSource" type="button">+ Agregar origen</button>
+            <datalist id="edTypes">
+              <option value="Afiche"><option value="Volante"><option value="Pendón"><option value="Pantalla">
+              <option value="Correo"><option value="Redes sociales"><option value="Presentación"><option value="Carné"><option value="Otro">
+            </datalist>
+          </section>
+
+          <section class="block">
+            <header class="sec"><span class="num">05</span><h2>Datos</h2></header>
+            <div class="card ed-fields" id="edData"></div>
+          </section>
+
+          <section class="block">
+            <header class="sec"><span class="num">06</span><h2>Publicar en GitHub</h2>
+              <p class="sec-hint">Opcional: para guardar los cambios directamente en el sitio publicado. El token solo se usa desde este navegador.</p></header>
+            <div class="card ed-fields" id="edGitHub"></div>
+          </section>
+        </div>
+
+        <aside class="ed-side">
+          <p class="eyebrow">Vista previa en vivo</p>
+        <label class="field ed-prev-lic"><span>Ver como</span><select id="edPreviewLic"></select></label>
+          <div class="phone"><iframe id="edPreview" src="index.html?preview=1" title="Vista previa de la página pública"></iframe></div>
+          <p class="eyebrow ed-side-h">¿Los QR están a salvo?</p>
+          <ul class="health" id="edHealth"></ul>
+        </aside>
+      </div>
+
+      <div class="ed-bar" id="edBar">
+        <div class="ed-bar-text"><b id="edStatus">Sin cambios</b><small id="edMode"></small></div>
+        <button class="btn ghost" id="edReset" type="button">Descartar</button>
+        <button class="btn" id="edDownload" type="button">Descargar config.js</button>
+        <button class="btn primary" id="edSave" type="button">Guardar</button>
+      </div>
+      <div class="ed-toast" id="edToast" role="status" hidden></div>
+    </section>
+  </main>
+
+  <!-- ================= DETALLE DE ORIGEN ================= -->
+  <dialog class="origin-dlg" id="originDlg" aria-labelledby="dlgTitle">
+    <button class="dlg-close" id="dlgClose" aria-label="Cerrar">✕</button>
+    <div class="dlg-grid">
+      <div class="dlg-media" id="dlgMedia"></div>
+      <div class="dlg-info">
+        <p class="eyebrow" id="dlgType"></p>
+        <h2 id="dlgTitle"></h2>
+        <p class="muted" id="dlgPlace"></p>
+        <p><code id="dlgId"></code></p>
+        <div class="mini-kpis" id="dlgKpis"></div>
+        <h3>A dónde van</h3>
+        <div class="bars" id="dlgLinks"></div>
+        <h3>Dispositivos</h3>
+        <div class="bars" id="dlgDevices"></div>
+        <div class="dlg-qr">
+          <div class="qrbox small" id="dlgQr"></div>
+          <div>
+            <p class="muted small" id="dlgLast"></p>
+            <div class="dlg-actions">
+              <button class="btn primary" id="dlgFilter">Filtrar el panel por este origen</button>
+              <button class="btn" id="dlgDownload">Descargar QR</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="tip" id="tip" role="tooltip" hidden></div>
+  <script src="assets/dashboard.js?v=20261019i"></script>
+  <script src="assets/editor.js?v=20261019j"></script>
+</body>
+</html>
