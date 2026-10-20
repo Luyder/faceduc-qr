@@ -1,0 +1,48 @@
+/* Página «Salidas de campo»: misma base que la página pública (hub.css) */
+.trip { padding-top: 40px; }
+.back {
+  align-self: flex-start; margin-bottom: 22px; font: 600 13px var(--sans); color: var(--ink-2); text-decoration: none;
+  border-bottom: 1.5px solid transparent;
+}
+.back:hover, .back:focus-visible { color: var(--lic-ink); border-bottom-color: currentColor; outline: none; }
+.trip .hub-head h1 em { display: block; font-style: italic; color: var(--lic-ink); }
+.lead { margin: 0; font: 400 20px/1.4 var(--serif); color: var(--ink-2); max-width: 460px; }
+
+/* tres ideas, numeradas como en los folletos */
+.trip-points { list-style: none; margin: 0 0 34px; padding: 0; counter-reset: p; border-top: 1.5px solid var(--rule); }
+.trip-points li {
+  position: relative; padding: 16px 0 16px 52px; border-bottom: 1.5px solid var(--rule); counter-increment: p;
+}
+.trip-points li::before {
+  content: counter(p, decimal-leading-zero); position: absolute; left: 2px; top: 14px;
+  font: italic 600 24px var(--serif); color: var(--lic-ink);
+}
+.trip-points h2 { margin: 0 0 4px; font: 600 20px/1.2 var(--serif); letter-spacing: -.01em; }
+.trip-points p { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); }
+
+/* tarjeta del recorrido 360 */
+.tour {
+  display: block; text-decoration: none; color: var(--ink); background: #fffdf8; border-radius: 18px; overflow: hidden;
+  box-shadow: 0 1px 0 rgba(20, 20, 20, .05), 0 14px 32px rgba(20, 20, 20, .10);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.tour:hover, .tour:focus-visible { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(20, 20, 20, .16); outline: none; }
+.tour:focus-visible { box-shadow: 0 0 0 3px var(--lic-ink); }
+.tour-media { position: relative; display: block; aspect-ratio: 16 / 9; background: #2a2a28; }
+.tour-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tour-badge {
+  position: absolute; top: 12px; right: 12px; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--red); color: #f6f1e3; font: italic 600 19px var(--serif); transform: rotate(10deg);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .25);
+}
+.tour-body { display: flex; flex-direction: column; gap: 4px; padding: 16px 18px 18px; }
+.tour-eyebrow { font: 600 11.5px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--lic-ink); }
+.tour-title { font: italic 600 23px/1.15 var(--serif); letter-spacing: -.01em; }
+.tour-text { font-size: 15px; line-height: 1.45; color: var(--ink-2); }
+.tour-cta {
+  align-self: flex-start; margin-top: 10px; display: inline-flex; gap: 8px; align-items: center;
+  background: var(--ink); color: var(--paper); border-radius: 999px; padding: 9px 16px; font: 600 14px var(--sans);
+}
+.tour:hover .tour-cta { background: var(--lic-ink); }
+
+.trip-more { margin-top: 30px; }

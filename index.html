@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/hub.css?v=20261020q">
-  <script src="config.js?v=20261020n"></script>
+  <link rel="stylesheet" href="assets/hub.css?v=20261020s">
+  <script src="config.js?v=20261020s"></script>
   <script>
     // ?preview=1 → vista previa dentro del editor: no registra visitas ni abre enlaces
     window.QRHUB_PREVIEW = /[?&]preview=1\b/.test(location.search);
@@ -43,6 +43,17 @@
       </a>
       <p class="subtitle" id="subtitle"></p>
     </header>
+
+    <!-- bloque destacado: salidas de campo -->
+    <a class="feature" id="feature" hidden>
+      <span class="feature-text">
+        <span class="feature-eyebrow" id="featEyebrow"></span>
+        <span class="feature-title" id="featTitle"></span>
+        <span class="feature-sub" id="featText"></span>
+      </span>
+      <span class="feature-pill" aria-hidden="true">360°</span>
+      <span class="feature-arrow" aria-hidden="true">→</span>
+    </a>
 
     <nav class="links" id="links" aria-label="Enlaces"></nav>
 
@@ -155,6 +166,7 @@
         eb.hidden = true;   // el logo de la Universidad y la Facultad ya lo dice
         if (!program) sub.classList.remove("tagline");
         renderSeal(C.badge);
+        renderFeature(C.fieldTrips);
 
         var facts = document.getElementById("facts");
         var f = program ? [program.semesters && program.semesters + " semestres", program.credits && program.credits + " créditos", program.snies && "SNIES " + program.snies].filter(Boolean) : [];
@@ -181,6 +193,25 @@
           more.hidden = true;
         }
         if (!shown) nav.appendChild(button(FALLBACK));
+      }
+
+      // ---------- salidas de campo (bloque destacado → salidas.html) ----------
+      function renderFeature(f) {
+        var a = document.getElementById("feature");
+        var ok = !!(f && f.show !== false && f.title && URL_OK.test(f.url || ""));
+        a.hidden = !ok;
+        if (!ok) return;
+        var q = new URLSearchParams(location.search), keep = new URLSearchParams();
+        ["lic", "src", "utm_campaign"].forEach(function (k) { if (q.get(k)) keep.set(k, q.get(k)); });
+        a.href = f.url + (keep.toString() ? (f.url.indexOf("?") < 0 ? "?" : "&") + keep.toString() : "");
+        document.getElementById("featEyebrow").textContent = f.eyebrow || "";
+        document.getElementById("featTitle").textContent = f.title;
+        document.getElementById("featText").textContent = f.text || "";
+        a.querySelector(".feature-pill").hidden = !f.tourUrl;
+        a.onclick = function (e) {
+          if (window.QRHUB_PREVIEW) { e.preventDefault(); return; }
+          if (window.QRHub) QRHub.trackClick({ id: "salidas-campo", label: f.title, url: f.url });
+        };
       }
 
       // ---------- sello de la beca (como el de los folletos) ----------

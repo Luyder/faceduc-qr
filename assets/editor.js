@@ -70,6 +70,17 @@
     ["image", "line1", "big", "line2", "url", "label"].forEach(function (k) { if (b[k]) o[k] = String(b[k]).trim(); });
     return "{ " + Object.keys(o).map(function (k) { return k + ": " + JSON.stringify(o[k]); }).join(", ") + " }";
   }
+  // otros ajustes que el editor no muestra (p. ej. fieldTrips): se conservan tal cual
+  var KNOWN = ["title", "subtitle", "avatar", "accent", "endpoint", "geo", "whatsapp", "facultyPage", "badge", "privacyNote", "programs", "links", "sources"];
+  function extraLines(cfg) {
+    var out = [];
+    Object.keys(cfg).forEach(function (k) {
+      if (KNOWN.indexOf(k) >= 0 || k.indexOf("__") === 0 || cfg[k] === undefined) return;
+      if (k === "fieldTrips") out.push("  // Salidas de campo: bloque destacado en todas las páginas y página propia (salidas.html)");
+      out.push("  " + k + ": " + JSON.stringify(cfg[k]) + ",", "");
+    });
+    return out;
+  }
   function generate(cfg) {
     var links = (cfg.links || []).map(function (l) {
       var type = l.type || "url";
@@ -121,7 +132,7 @@
       "",
       "  // Sello como el de los folletos. show: false para ocultarlo",
       "  badge: " + badgeLine(cfg.badge) + ",",
-      "",
+      ""].concat(extraLines(cfg), [
       "  // Aviso breve de privacidad al pie de la página",
       "  privacyNote: " + J(cfg.privacyNote || "") + ",",
       "",
@@ -149,7 +160,7 @@
       "  ]",
       "};",
       ""
-    ].join("\n");
+    ]).join("\n");
   }
 
   // ================================================================

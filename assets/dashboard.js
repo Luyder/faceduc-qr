@@ -50,7 +50,7 @@
   }
   var SPECIAL = { directo: "Directo (sin QR)", referido: "Desde otro sitio web" };
   function srcLabel(id) { var s = lookup(C.sources, id); return s ? s.label : (SPECIAL[id] || id || "—"); }
-  function linkLabel(id) { var l = lookup(C.links, id); return l ? l.label : id === "sello-beca" ? "Sello beca 66%" : (id || "—"); }
+  function linkLabel(id) { var l = lookup(C.links, id); return l ? l.label : ({ "sello-beca": "Sello beca 66%", "salidas-campo": "Salidas de campo", "recorrido-360": "Recorrido 360" })[id] || (id || "—"); }
   function licInfo(id) { return lookup(C.programs, id); }
   function licLabel(id) { var p = licInfo(id); return p ? p.name : (id ? id : "Sin licenciatura (selector)"); }
   function licColor(id) { var p = licInfo(id); return p && p.color ? p.color : "#c9c4b6"; }

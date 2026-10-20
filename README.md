@@ -39,6 +39,10 @@ Los botones son los mismos para todas; dos cambian solos según la licenciatura:
 
 Los ids de las licenciaturas (`artes`, `biologia`, `infantil`, `espanol-filologia`, `filosofia`, `fisica`, `historia`, `matematicas`, `quimica`) quedan fijos 🔒 igual que los demás.
 
+### Salidas de campo
+
+Todas las páginas muestran un bloque verde destacado que lleva a `salidas.html`: explica que son salidas semestrales, abiertas a cualquier estudiante, para conocer las realidades del país, y enlaza al recorrido 360 del espacio (`fieldTrips.tourUrl` en `config.js`). La página conserva la licenciatura y el origen del QR, y registra las visitas y los clics al recorrido.
+
 ### Pensum interactivo
 
 `pensum/ver.html?p=artes` muestra el plan de estudios de Artes con el diseño hecho en Figma: al tocar un curso aparece su descripción, créditos y requisitos, y se resaltan los cursos que van antes, a la par y después. En celular se ve un semestre a la vez. Hay uno por licenciatura (`pensum/data/<id>.js`): cursos, créditos y descripciones vienen de los pensums oficiales en Genially; el de Artes sigue el diseño hecho en Figma. Las fotos (`pensum/img/`) son las del portal de oferta de cursos de la Facultad (cursos EDUC) y las fichas oficiales de la Facultad de Artes y Humanidades (talleres de Arte, Historia del arte y Literatura).

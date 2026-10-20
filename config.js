@@ -32,6 +32,10 @@ window.HUB_CONFIG = {
   // Sello como el de los folletos. show: false para ocultarlo
   badge: { show: true, image: "assets/sello-beca-66.png", line1: "Tenemos beca del", big: "66%", line2: "Para todos y todas", url: "https://apoyofinanciero.uniandes.edu.co/decidi-ensenar", label: "Beca Decidí Enseñar: 66% al ser admitido" },
 
+  // Salidas de campo: bloque destacado en todas las páginas y página propia (salidas.html)
+  //   tourUrl = visor 360 del espacio que se abre desde esa página
+  fieldTrips: { show: true, eyebrow: "Cada semestre", title: "Salidas de campo", text: "Conoce las realidades del país", url: "salidas.html", tourUrl: "https://luyder.github.io/Prueba3D1/", tourImage: "assets/recorrido-360.webp" },
+
   // Aviso breve de privacidad al pie de la página
   privacyNote: "Registramos datos anónimos de visita (dispositivo, origen y enlace elegido) para mejorar nuestros servicios. No guardamos datos personales.",
 
