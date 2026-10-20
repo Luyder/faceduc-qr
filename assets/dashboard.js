@@ -384,8 +384,9 @@
       .sort(function (a, b) { return b[1].length - a[1].length; });
     if (!rows.length) { t.appendChild(emptyRow()); return; }
     var pensumIds = (C.links || []).filter(function (l) { return l.type === "pensum"; }).map(function (l) { return l.id; });
-    var waIds = (C.links || []).filter(function (l) { return l.type === "whatsapp"; }).map(function (l) { return l.id; });
-    headRow(t, [["Licenciatura"], ["Sesiones", 1], ["Conversión", 1], ["Pensum", 1], ["WhatsApp", 1], ["Enlace favorito"], ["Origen principal"]]);
+    // asesoría = WhatsApp o cita (Teams/Bookings)
+    var waIds = (C.links || []).filter(function (l) { return l.type === "whatsapp" || /bookings|teams|asesor/i.test((l.url || "") + " " + l.id); }).map(function (l) { return l.id; });
+    headRow(t, [["Licenciatura"], ["Sesiones", 1], ["Conversión", 1], ["Pensum", 1], ["Asesoría", 1], ["Enlace favorito"], ["Origen principal"]]);
     var max = Math.max(1, rows[0][1].length), tb = el("tbody");
     rows.forEach(function (r) {
       var list = r[1], tr = el("tr");
@@ -786,6 +787,11 @@
         out.push(["warn", "«" + (l.label || l.id) + "» no tiene una url válida", "No se mostrará en la página y los QR directos a él abrirán la página completa en su lugar."]);
       if (type === "whatsapp" && !String(l.phone || cfg.whatsapp || "").replace(/\D/g, ""))
         out.push(["warn", "Falta el número de WhatsApp", "El botón «" + (l.label || l.id) + "» no se mostrará hasta que pongas el número de asesoría."]);
+      if (type === "page") {
+        var sinPag = progs.filter(function (p) { return !URL_OK.test(p.page || ""); });
+        if (sinPag.length) out.push(["warn", "Licenciaturas sin página oficial: " + sinPag.map(function (p) { return p.name || p.id; }).join(", "), "En su página no aparecerá el botón «" + (l.label || l.id) + "»."]);
+        if (!URL_OK.test(cfg.facultyPage || "")) out.push(["warn", "Falta la página de la Facultad", "El botón «" + (l.label || l.id) + "» no aparecerá en la página principal."]);
+      }
       if (type === "pensum") {
         var sin = progs.filter(function (p) { return !URL_OK.test(p.pensum || ""); });
         if (sin.length) out.push(["warn", "Licenciaturas sin pensum: " + sin.map(function (p) { return p.name || p.id; }).join(", "), "En su página no aparecerá el botón «" + (l.label || l.id) + "»."]);

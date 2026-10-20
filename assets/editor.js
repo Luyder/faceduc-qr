@@ -21,7 +21,7 @@
 
   var DEFAULTS = {
     title: "", subtitle: "", avatar: "", accent: "#2347c5", endpoint: "", geo: false,
-    privacyNote: "", whatsapp: "", programs: [], links: [], sources: []
+    privacyNote: "", whatsapp: "", facultyPage: "", programs: [], links: [], sources: []
   };
   function all(cfg) { return (cfg.links || []).concat(cfg.sources || [], cfg.programs || []); }
 
@@ -67,13 +67,14 @@
   function generate(cfg) {
     var links = (cfg.links || []).map(function (l) {
       var type = l.type || "url";
-      var keys = type === "url" ? ["id", "aliases", "label", "url", "icon", "hidden"]
+      var keys = type === "url" ? ["id", "aliases", "label", "url", "icon", "embed", "hidden"]
         : type === "whatsapp" ? ["id", "aliases", "label", "type", "message", "phone", "icon", "hidden"]
-        : ["id", "aliases", "label", "type", "icon", "hidden"];
+        : type === "page" ? ["id", "aliases", "label", "type", "homeLabel", "icon", "embed", "hidden"]
+        : ["id", "aliases", "label", "type", "icon", "embed", "hidden"];
       return itemLine(cleanItem(l, keys));
     });
     var programs = (cfg.programs || []).map(function (p) {
-      var o = cleanItem(p, ["id", "aliases", "name", "color", "snies", "semesters", "credits", "pensum", "whatsappMessage"]);
+      var o = cleanItem(p, ["id", "aliases", "name", "color", "snies", "semesters", "credits", "page", "pensum", "whatsappMessage"]);
       ["semesters", "credits"].forEach(function (k) { if (o[k] != null && /^\d+$/.test(String(o[k]))) o[k] = Number(o[k]); });
       return itemLine(o);
     });
@@ -109,11 +110,14 @@
       "  // Número de WhatsApp de asesoría (con indicativo, sin + ni espacios)",
       "  whatsapp: " + J(String(cfg.whatsapp || "").replace(/\D+/g, "")) + ",",
       "",
+      "  // Página que abre el botón «Conoce…» en la página principal (sin licenciatura elegida)",
+      "  facultyPage: " + J(cfg.facultyPage || "") + ",",
+      "",
       "  // Aviso breve de privacidad al pie de la página",
       "  privacyNote: " + J(cfg.privacyNote || "") + ",",
       "",
       "  // Licenciaturas: cada una es un nodo propio (?lic=ID).",
-      "  //   id 🔒 fijo · name nombre tras «Licenciatura en» · color identidad · pensum enlace al plan de estudios",
+      "  //   id 🔒 fijo · name nombre tras «Licenciatura en» · color identidad · page página oficial · pensum plan de estudios",
       "  //   whatsappMessage (opcional) reemplaza el mensaje general de WhatsApp para esta licenciatura",
       "  programs: [",
       programs.join(",\n"),
@@ -121,7 +125,8 @@
       "",
       "  // Botones de la página (los mismos para todas las licenciaturas).",
       "  //   id 🔒 fijo · label texto · icon emoji opcional · hidden oculto (QR directos siguen funcionando)",
-      "  //   type \"url\" usa url · \"pensum\" usa el pensum de la licenciatura · \"whatsapp\" usa message ({programa} = nombre)",
+      "  //   type \"url\" usa url · \"pensum\" pensum de la licenciatura · \"page\" su página oficial · \"whatsapp\" usa message ({programa} = nombre)",
+      "  //   embed: true se abre dentro de la página · homeLabel texto en la página principal",
       "  //   aliases = ids antiguos que siguen llevando a este botón",
       "  links: [",
       links.join(",\n"),
@@ -269,12 +274,15 @@
       } else if (type === "whatsapp") {
         g.appendChild(field("Mensaje de WhatsApp", input(l.message, function (v) { l.message = v; }, { placeholder: "Hola, quiero información sobre la Licenciatura en {programa}." }),
           "{programa} se cambia por el nombre de cada licenciatura. El número va en la sección 02."));
+      } else if (type === "page") {
+        g.appendChild(field("Texto en la página principal", input(l.homeLabel, function (v) { l.homeLabel = v; }, { placeholder: "Conoce las licenciaturas" }),
+          "Abre la página oficial de cada licenciatura; en la principal, la página de la Facultad (sección 02)."));
       } else {
         g.appendChild(field("Destino", el("p", "ed-note", "El pensum de cada licenciatura (se define en la sección 02).")));
       }
       body.appendChild(g);
       var sel = el("select", "ed-type");
-      [["url", "Enlace fijo"], ["pensum", "Pensum de la licenciatura"], ["whatsapp", "WhatsApp con mensaje"]].forEach(function (o) {
+      [["url", "Enlace fijo"], ["pensum", "Pensum de la licenciatura"], ["page", "Página de la licenciatura"], ["whatsapp", "WhatsApp con mensaje"]].forEach(function (o) {
         var op = el("option", null, o[1]); op.value = o[0]; sel.appendChild(op);
       });
       sel.value = type;
@@ -287,6 +295,13 @@
       var foot = el("div", "ed-foot");
       foot.appendChild(idChip(l, draft.links, "botón"));
       foot.appendChild(tf);
+      if (type !== "whatsapp") {
+        var emb = el("label", "check");
+        emb.appendChild(input(l.embed, function (v) { l.embed = v || undefined; }, { type: "checkbox" }));
+        emb.appendChild(document.createTextNode(" Abrir dentro de la página"));
+        emb.title = "Funciona con páginas que permiten mostrarse incrustadas (como el pensum en Genially). Otras se abrirán en blanco.";
+        foot.appendChild(emb);
+      }
       var vis = el("label", "check");
       vis.appendChild(input(!l.hidden, function (v) { l.hidden = !v; row.classList.toggle("is-hidden", !v); }, { type: "checkbox" }));
       vis.appendChild(document.createTextNode(" Visible en la página"));
@@ -319,6 +334,8 @@
       n.classList.toggle("is-invalid", !!v && draft.whatsapp.length < 10);
     }, { placeholder: "573103018445", type: "tel" });
     box.appendChild(field("Número de WhatsApp de asesoría", w, "Con indicativo de país y sin + ni espacios. Ej.: 57 310 301 8445 → 573103018445"));
+    var fp = input(draft.facultyPage, function (v, n) { draft.facultyPage = v.trim(); n.classList.toggle("is-invalid", !!v && !URL_RE.test(v.trim())); }, { type: "url", placeholder: "https://educacion.uniandes.edu.co/es/oferta-academica/pregrado" });
+    box.appendChild(field("Página de la Facultad (para la página principal)", fp, "La abre el botón de tipo «Página de la licenciatura» cuando no hay licenciatura elegida."));
   }
 
   function renderPrograms() {
@@ -348,6 +365,9 @@
       var pen = input(p.pensum, function (v, n) { p.pensum = v.trim(); n.classList.toggle("is-invalid", !!v && !URL_RE.test(v.trim())); }, { type: "url", placeholder: "https://…" });
       pen.classList.toggle("is-invalid", !!p.pensum && !URL_RE.test(p.pensum));
       body.appendChild(field("Enlace al pensum", pen));
+      var pg = input(p.page, function (v, n) { p.page = v.trim(); n.classList.toggle("is-invalid", !!v && !URL_RE.test(v.trim())); }, { type: "url", placeholder: "https://educacion.uniandes.edu.co/…" });
+      pg.classList.toggle("is-invalid", !!p.page && !URL_RE.test(p.page));
+      body.appendChild(field("Página oficial de la licenciatura", pg));
       body.appendChild(field("Mensaje de WhatsApp propio (opcional)", input(p.whatsappMessage, function (v) { p.whatsappMessage = v; }, {
         placeholder: window.QRNodes ? QRNodes.fill(generalWaMessage(), p) : "" }), "Vacío = usa el mensaje general del botón de WhatsApp."));
       var foot = el("div", "ed-foot");

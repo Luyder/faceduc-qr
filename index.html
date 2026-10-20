@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/hub.css?v=20261019h">
-  <script src="config.js?v=20261019h"></script>
+  <link rel="stylesheet" href="assets/hub.css?v=20261020b">
+  <script src="config.js?v=20261020b"></script>
   <script>
     // ?preview=1 → vista previa dentro del editor: no registra visitas ni abre enlaces
     window.QRHUB_PREVIEW = /[?&]preview=1\b/.test(location.search);
@@ -36,6 +36,11 @@
 
     <nav class="links" id="links" aria-label="Enlaces"></nav>
 
+    <section class="more" id="more" hidden>
+      <p class="eyebrow">Más información</p>
+      <nav class="links" id="moreLinks" aria-label="Más información"></nav>
+    </section>
+
     <p class="redirect" id="redirect" hidden></p>
     <p class="facts" id="facts" hidden></p>
 
@@ -45,8 +50,21 @@
     </footer>
   </main>
 
-  <script src="assets/nodes.js?v=20261019h"></script>
-  <script src="assets/tracker.js?v=20261019h"></script>
+  <!-- visor para abrir el pensum dentro de la misma página -->
+  <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="viewerTitle" hidden>
+    <div class="viewer-bar">
+      <div class="viewer-head">
+        <p class="eyebrow" id="viewerEyebrow"></p>
+        <h2 id="viewerTitle"></h2>
+      </div>
+      <a class="viewer-ext" id="viewerOpen" target="_blank" rel="noopener">Abrir ↗</a>
+      <button class="viewer-close" id="viewerClose" type="button" aria-label="Cerrar">✕</button>
+    </div>
+    <iframe class="viewer-frame" id="viewerFrame" title="Pensum" allow="fullscreen" allowfullscreen></iframe>
+  </div>
+
+  <script src="assets/nodes.js?v=20261020b"></script>
+  <script src="assets/tracker.js?v=20261020b"></script>
   <script>
     /* Respaldo fijo: si config.js se borra o queda con un error al editarlo,
        la página no queda en blanco y los QR impresos siguen llevando a algún lugar. */
@@ -54,6 +72,7 @@
 
     (function () {
       var nav = document.getElementById("links");
+      var more = document.getElementById("more"), moreNav = document.getElementById("moreLinks");
       var N = window.QRNodes;
       var URL_OK = /^(https?:|mailto:|tel:)/i;
 
@@ -62,7 +81,8 @@
       function button(l, href) {
         var a = el("a", "link");
         a.href = href || l.url;
-        if (!href) a.rel = "noopener";
+        // enlaces externos: pestaña nueva, para que el nodo siga abierto
+        if (!href) { a.target = "_blank"; a.rel = "noopener"; }
         if (l.dot) { var d = el("span", "dot"); d.style.background = l.dot; d.setAttribute("aria-hidden", "true"); a.appendChild(d); }
         if (l.icon) { var i = el("span", "icon", l.icon); i.setAttribute("aria-hidden", "true"); a.appendChild(i); }
         a.appendChild(el("span", "label", l.label || l.url));
@@ -129,7 +149,9 @@
         facts.hidden = !f.length;
 
         nav.textContent = "";
+        moreNav.textContent = "";
         var shown = 0;
+        current = program;
         if (chooser) {
           programs.forEach(function (p) {
             var a = button({ label: p.name, dot: p.color, ink: N ? N.ink(p.color || "#2347c5", 3) : p.color }, hrefFor(p.id));
@@ -138,21 +160,58 @@
             });
             nav.appendChild(a); shown++;
           });
+          // debajo del selector: los enlaces que no dependen de la licenciatura (cita por Teams, becas…)
+          addLinks(moreNav, linkList(C, null));
+          more.hidden = !moreNav.children.length;
         } else {
-          var list = N ? N.linksFor(C, program) : C.links.filter(function (l) { return l && !l.hidden && URL_OK.test(l.url || ""); });
-          list.forEach(function (l) {
-            var a = button(l);
-            // click izquierdo, medio (auxclick) y teclado registran la salida
-            a.addEventListener("click", function (e) {
-              if (window.QRHUB_PREVIEW) { e.preventDefault(); return; }
-              if (window.QRHub) QRHub.trackClick(l);
-            });
-            a.addEventListener("auxclick", function (e) { if (e.button === 1 && window.QRHub && !window.QRHUB_PREVIEW) QRHub.trackClick(l); });
-            nav.appendChild(a); shown++;
-          });
+          shown = addLinks(nav, linkList(C, program));
+          more.hidden = true;
         }
         if (!shown) nav.appendChild(button(FALLBACK));
       }
+
+      function linkList(C, program) {
+        return N ? N.linksFor(C, program) : C.links.filter(function (l) { return l && !l.hidden && URL_OK.test(l.url || ""); });
+      }
+
+      function addLinks(container, list) {
+        list.forEach(function (l) {
+          var a = button(l);
+          // click izquierdo, medio (auxclick) y teclado registran la salida
+          a.addEventListener("click", function (e) {
+            if (window.QRHUB_PREVIEW) { e.preventDefault(); return; }
+            if (window.QRHub) QRHub.trackClick(l);
+            if (l.embed && !(e.metaKey || e.ctrlKey || e.shiftKey)) { e.preventDefault(); openViewer(l); }
+          });
+          a.addEventListener("auxclick", function (e) { if (e.button === 1 && window.QRHub && !window.QRHUB_PREVIEW) QRHub.trackClick(l); });
+          container.appendChild(a);
+        });
+        return list.length;
+      }
+
+      // ---------- visor del pensum ----------
+      var viewer = document.getElementById("viewer"), frame = document.getElementById("viewerFrame"), current = null;
+      function openViewer(l) {
+        document.getElementById("viewerEyebrow").textContent = current ? "Licenciatura en " + current.name : "";
+        document.getElementById("viewerTitle").textContent = l.label || "";
+        document.getElementById("viewerOpen").href = l.url;
+        frame.title = l.label || "Contenido";
+        if (frame.src !== l.url) frame.src = l.url;
+        viewer.hidden = false;
+        document.body.classList.add("viewer-open");
+        document.getElementById("viewerClose").focus();
+        // el botón «atrás» del celular cierra el visor en vez de salir de la página
+        if (!history.state || !history.state.viewer) history.pushState({ viewer: 1 }, "");
+      }
+      function closeViewer(fromHistory) {
+        if (viewer.hidden) return;
+        viewer.hidden = true;
+        document.body.classList.remove("viewer-open");
+        if (!fromHistory && history.state && history.state.viewer) history.back();
+      }
+      document.getElementById("viewerClose").addEventListener("click", function () { closeViewer(false); });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeViewer(false); });
+      window.addEventListener("popstate", function () { closeViewer(true); });
 
       var lic = new URLSearchParams(location.search).get("lic") || "";
       render(window.HUB_CONFIG, lic);
@@ -167,6 +226,7 @@
       }
 
       if (window.QRHub) QRHub.start(function (direct) {
+        if (direct.embed) { openViewer(direct); return; }   // QR directo al pensum: se abre dentro de la página
         nav.hidden = true;
         var r = document.getElementById("redirect");
         r.hidden = false;

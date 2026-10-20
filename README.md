@@ -28,12 +28,14 @@ Cada licenciatura tiene su propia página con su color, su pensum y su mensaje d
 |---|---|
 | `…/?lic=artes&src=afiche-biblioteca` | Página de la **Licenciatura en Artes** |
 | `…/?lic=fisica&src=volante-evento&to=programa` | Lleva directo al **pensum de Física** |
-| `…/?src=afiche-biblioteca` (sin `lic`) | Selector con las 9 licenciaturas |
+| `…/?src=afiche-biblioteca` (sin `lic`) | Página principal: las 9 licenciaturas y, debajo, cita por Teams, becas, etc. |
 
 Los botones son los mismos para todas; dos cambian solos según la licenciatura:
 
 - **Pensum del programa** (`type: "pensum"`) abre el plan de estudios de esa licenciatura.
-- **Asesoría por WhatsApp** (`type: "whatsapp"`) abre el chat de asesoría con un mensaje ya escrito: «Hola, quiero recibir asesoría sobre la Licenciatura en *{programa}*.» Cada licenciatura puede tener su propio mensaje (`whatsappMessage`).
+- **Conoce la licenciatura** (`type: "page"`) abre su página oficial; en la página principal abre `facultyPage` con el texto `homeLabel`.
+- **Agenda una asesoría por Teams** abre el servicio «Pregrado – Asesoría Personalizada» de Microsoft Bookings (con Valentina Aldana Sabogal). Reemplaza al botón de WhatsApp, que quedó oculto (`hidden: true`) sin romper QR; su mensaje por licenciatura sigue configurado por si se quiere volver a mostrar.
+- Los enlaces con `embed: true` (el pensum) se abren **dentro de la misma página**; los demás enlaces externos se abren en **una pestaña nueva** para que el nodo siga abierto.
 
 Los ids de las licenciaturas (`artes`, `biologia`, `infantil`, `espanol-filologia`, `filosofia`, `fisica`, `historia`, `matematicas`, `quimica`) quedan fijos 🔒 igual que los demás.
 

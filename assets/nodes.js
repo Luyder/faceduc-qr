@@ -6,6 +6,8 @@
        type "url"       → usa su url tal cual
        type "pensum"    → usa el pensum de la licenciatura
        type "whatsapp"  → abre WhatsApp con un mensaje según la licenciatura
+       type "page"      → página oficial de la licenciatura (en la principal, cfg.facultyPage)
+   - embed: true → se abre dentro de la página (p. ej. el pensum) en vez de salir
    ============================================================ */
 (function () {
   "use strict";
@@ -38,6 +40,7 @@
     if (!link) return "";
     var type = link.type || "url";
     if (type === "pensum") return program && program.pensum ? program.pensum : "";
+    if (type === "page") return program ? (program.page || "") : (cfg.facultyPage || "");
     if (type === "whatsapp") {
       var phone = digits(link.phone || cfg.whatsapp);
       if (!phone) return "";
@@ -55,6 +58,7 @@
         var copy = {};
         for (var k in l) copy[k] = l[k];
         copy.url = linkUrl(cfg, l, program);
+        if (!program && l.homeLabel) copy.label = l.homeLabel;   // texto distinto en la página principal
         return copy;
       })
       .filter(function (l) { return /^(https?:|mailto:|tel:)/i.test(l.url); });

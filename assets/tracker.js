@@ -223,7 +223,8 @@
         send(v);
         if (direct) {
           trackClick(direct);
-          setTimeout(function () { location.replace(direct.url); }, CFG.endpoint ? 50 : 0);
+          // los enlaces que se abren dentro de la página (pensum) no redirigen
+          if (!direct.embed) setTimeout(function () { location.replace(direct.url); }, CFG.endpoint ? 50 : 0);
         }
       });
       return direct;

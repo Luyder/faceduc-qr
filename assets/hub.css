@@ -121,3 +121,40 @@ body {
 
 .hub-foot { margin-top: auto; padding-top: 48px; }
 .hub-foot p { font-size: 12px; line-height: 1.5; color: var(--ink-3); margin: 0; max-width: 460px; }
+
+/* ---------- más información (página principal) ---------- */
+.more { margin-top: 40px; }
+.more .eyebrow { margin-bottom: 12px; }
+.more .link { min-height: 58px; font-size: 19px; }
+
+/* ---------- visor del pensum dentro de la página ---------- */
+body.viewer-open { overflow: hidden; }
+.viewer {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; flex-direction: column;
+  background: var(--paper);
+  animation: viewer-in .22s ease-out;
+}
+@keyframes viewer-in { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.viewer-bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: max(12px, env(safe-area-inset-top)) 16px 12px;
+  border-bottom: 1.5px solid var(--rule);
+}
+.viewer-head { flex: 1; min-width: 0; }
+.viewer-head .eyebrow { margin: 0 0 2px; color: var(--lic-ink); }
+.viewer-head h2 {
+  margin: 0; font-family: var(--serif); font-style: italic; font-weight: 600; font-size: 22px; letter-spacing: -.01em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.viewer-ext { font-size: 13px; font-weight: 600; color: var(--ink-2); text-decoration: none; white-space: nowrap; }
+.viewer-ext:hover { color: var(--lic-ink); }
+.viewer-close {
+  flex: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+  border: 1.5px solid var(--rule); background: var(--paper); color: var(--ink); font-size: 16px;
+}
+.viewer-close:hover, .viewer-close:focus-visible { background: var(--lic-ink); border-color: var(--lic-ink); color: #fff; outline: none; }
+.viewer-frame { flex: 1; width: 100%; border: 0; background: #fff; }
+@media (min-width: 900px) {
+  .viewer { inset: 24px; border-radius: 18px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.25), 0 0 0 100vmax rgba(20,20,20,.45); }
+}
