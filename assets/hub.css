@@ -194,6 +194,6 @@ body.viewer-open { overflow: hidden; }
 
 /* ---------- sello con la imagen del diseño ---------- */
 .seal.has-img svg, .seal.has-img .seal-text { display: none; }
-.seal-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transform: rotate(18deg); }
+.seal-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }   /* tal cual el diseño enviado, con su inclinación original */
 .seal.has-img { width: 136px; height: 136px; }
 @media (min-width: 700px) { .seal.has-img { width: 156px; height: 156px; } }
