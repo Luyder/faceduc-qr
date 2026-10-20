@@ -214,7 +214,7 @@
     // Registra la visita. Si hay ?to=ID válido, redirige directamente (modo acortador).
     start: function (onReady) {
       var direct = target ? findLink(target) : null;
-      if (direct && !/^(https?:|mailto:|tel:)/i.test(direct.url || "")) direct = null;   // destino inválido → mostrar la página
+      if (direct && !/^(https?:|mailto:|tel:)|^(?!\/)[\w.\/-]+\.html?(\?[^\s#]*)?(#[\w-]*)?$/i.test(direct.url || "")) direct = null;   // destino inválido → mostrar la página
       var wait = direct ? Promise.race([geoReady, new Promise(function (r) { setTimeout(r, 400); })]) : geoReady;
       if (direct && onReady) onReady(direct);
       wait.then(function () {

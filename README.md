@@ -39,6 +39,10 @@ Los botones son los mismos para todas; dos cambian solos según la licenciatura:
 
 Los ids de las licenciaturas (`artes`, `biologia`, `infantil`, `espanol-filologia`, `filosofia`, `fisica`, `historia`, `matematicas`, `quimica`) quedan fijos 🔒 igual que los demás.
 
+### Pensum interactivo
+
+`pensum/ver.html?p=artes` muestra el plan de estudios de Artes con el diseño hecho en Figma: al tocar un curso aparece su descripción, créditos y requisitos, y se resaltan los cursos que van antes, a la par y después. En celular se ve un semestre a la vez. Los datos están en `pensum/data/artes.js` (descripciones tomadas del pensum oficial en Genially). Para otra licenciatura: crea `pensum/data/<id>.js` con la misma estructura y pon `pensum: "pensum/ver.html?p=<id>"` en `config.js`.
+
 ## 1. Configura tus enlaces
 
 **Sin tocar código:** abre `dashboard.html` ▸ pestaña **Configurar**. Ahí editas el título, el logo, los botones (texto, destino, ícono, visible/oculto, orden) y los orígenes (nombre, tipo, ubicación, imagen), con una vista previa en vivo de la página. El editor:

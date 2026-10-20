@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="color-scheme" content="light only">
+  <meta name="theme-color" content="#f7f4ec">
+  <title>Plan de estudios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="pensum.css?v=20261020a">
+</head>
+<body>
+  <main class="pen" id="app">
+    <header class="pen-head">
+      <div>
+        <h1 id="title"></h1>
+        <p class="pen-sub" id="sub"></p>
+        <i class="pen-rule" aria-hidden="true"></i>
+      </div>
+      <p class="pen-hint">Toca un curso para ver su descripción y sus requisitos.</p>
+    </header>
+
+    <!-- celular: un semestre a la vez -->
+    <nav class="sem-tabs" id="semTabs" aria-label="Semestres"></nav>
+
+    <section class="board" id="board" aria-label="Plan de estudios"></section>
+
+    <footer class="pen-foot">
+      <div class="legend">
+        <span><b class="dot-demo">#</b> Créditos</span>
+        <span><i class="tag before">antes</i> Prerrequisito</span>
+        <span><i class="tag along">a la par</i> Correquisito</span>
+        <span><i class="tag after">después</i> Lo habilita</span>
+      </div>
+      <ol class="notes" id="notes"></ol>
+      <p class="source" id="source"></p>
+    </footer>
+  </main>
+
+  <!-- ficha del curso -->
+  <div class="sheet-wrap" id="sheetWrap" hidden>
+    <article class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sTitle">
+      <header class="sheet-head" id="sHead">
+        <p class="sheet-area" id="sArea"></p>
+        <h2 id="sTitle"></h2>
+        <p class="sheet-meta" id="sMeta"></p>
+        <button class="sheet-close" id="sClose" type="button" aria-label="Cerrar">✕</button>
+      </header>
+      <div class="sheet-body" id="sBody"></div>
+    </article>
+  </div>
+
+  <script src="pensum.js?v=20261020a"></script>
+</body>
+</html>

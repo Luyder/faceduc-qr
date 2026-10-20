@@ -16,12 +16,12 @@
       .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
   }
   var ID_RE = /^[a-z0-9][a-z0-9_-]*$/;
-  var URL_RE = /^(https?:|mailto:|tel:)/i;
+  var URL_RE = /^(https?:|mailto:|tel:)|^(?!\/)[\w.\/-]+\.html?(\?[^\s#]*)?(#[\w-]*)?$/i;
   var LS = (function () { try { localStorage.setItem("__t", "1"); localStorage.removeItem("__t"); return localStorage; } catch (e) { return null; } })();
 
   var DEFAULTS = {
     title: "", subtitle: "", avatar: "", accent: "#2347c5", endpoint: "", geo: false,
-    privacyNote: "", whatsapp: "", facultyPage: "", programs: [], links: [], sources: []
+    privacyNote: "", whatsapp: "", facultyPage: "", badge: { show: false }, programs: [], links: [], sources: []
   };
   function all(cfg) { return (cfg.links || []).concat(cfg.sources || [], cfg.programs || []); }
 
@@ -64,6 +64,12 @@
   function itemLine(o) {
     return "    { " + Object.keys(o).map(function (k) { return k + ": " + JSON.stringify(o[k]); }).join(", ") + " }";
   }
+  function badgeLine(b) {
+    b = b || {};
+    var o = { show: b.show !== false };
+    ["line1", "big", "line2", "url", "label"].forEach(function (k) { if (b[k]) o[k] = String(b[k]).trim(); });
+    return "{ " + Object.keys(o).map(function (k) { return k + ": " + JSON.stringify(o[k]); }).join(", ") + " }";
+  }
   function generate(cfg) {
     var links = (cfg.links || []).map(function (l) {
       var type = l.type || "url";
@@ -74,7 +80,7 @@
       return itemLine(cleanItem(l, keys));
     });
     var programs = (cfg.programs || []).map(function (p) {
-      var o = cleanItem(p, ["id", "aliases", "name", "color", "snies", "semesters", "credits", "page", "pensum", "whatsappMessage"]);
+      var o = cleanItem(p, ["id", "aliases", "name", "tagline", "color", "snies", "semesters", "credits", "page", "pensum", "whatsappMessage"]);
       ["semesters", "credits"].forEach(function (k) { if (o[k] != null && /^\d+$/.test(String(o[k]))) o[k] = Number(o[k]); });
       return itemLine(o);
     });
@@ -113,11 +119,15 @@
       "  // Página que abre el botón «Conoce…» en la página principal (sin licenciatura elegida)",
       "  facultyPage: " + J(cfg.facultyPage || "") + ",",
       "",
+      "  // Sello como el de los folletos. show: false para ocultarlo",
+      "  badge: " + badgeLine(cfg.badge) + ",",
+      "",
       "  // Aviso breve de privacidad al pie de la página",
       "  privacyNote: " + J(cfg.privacyNote || "") + ",",
       "",
       "  // Licenciaturas: cada una es un nodo propio (?lic=ID).",
       "  //   id 🔒 fijo · name nombre tras «Licenciatura en» · color identidad · page página oficial · pensum plan de estudios",
+      "  //   tagline texto bajo el título (el de la página oficial)",
       "  //   whatsappMessage (opcional) reemplaza el mensaje general de WhatsApp para esta licenciatura",
       "  programs: [",
       programs.join(",\n"),
@@ -197,6 +207,22 @@
 
     box.appendChild(field("Color de acento (números y botón activo)", input(draft.accent || "#2347c5", function (v) { draft.accent = v; paintAvatar(); }, { type: "color", cls: "ed-color" })));
     box.appendChild(field("Aviso de privacidad (pie de página)", input(draft.privacyNote, function (v) { draft.privacyNote = v; }, { textarea: true })));
+
+    var b = draft.badge = draft.badge || { show: false };
+    var bw = el("div", "ed-badge");
+    var sh = el("label", "check");
+    sh.appendChild(input(b.show !== false, function (v) { b.show = v; }, { type: "checkbox" }));
+    sh.appendChild(document.createTextNode(" Mostrar el sello (como el de los folletos)"));
+    bw.appendChild(sh);
+    var bg = el("div", "ed-grid progs");
+    bg.appendChild(field("Línea de arriba", input(b.line1, function (v) { b.line1 = v; }, { placeholder: "¡Tenemos beca del" })));
+    bg.appendChild(field("Grande", input(b.big, function (v) { b.big = v; }, { placeholder: "66%" })));
+    bg.appendChild(field("Línea de abajo", input(b.line2, function (v) { b.line2 = v; }, { placeholder: "pregunta por ella" })));
+    bw.appendChild(bg);
+    var bu = input(b.url, function (v, n) { b.url = v.trim(); n.classList.toggle("is-invalid", !!v && !URL_RE.test(v.trim())); }, { type: "url", placeholder: "https://apoyofinanciero.uniandes.edu.co/decidi-ensenar" });
+    bw.appendChild(field("Al tocar el sello abre", bu));
+    bw.appendChild(field("Texto para lectores de pantalla", input(b.label, function (v) { b.label = v; }, { placeholder: "Beca Decidí Enseñar: 66% al ser admitido" })));
+    box.appendChild(field("Sello", bw));
   }
 
   function idChip(item, list, kind) {
@@ -357,6 +383,8 @@
       }, { placeholder: "Artes" }));
       head.appendChild(nm);
       body.appendChild(head);
+      body.appendChild(field("Texto bajo el título", input(p.tagline, function (v) { p.tagline = v; }, { textarea: true, placeholder: "Crea, enseña y transforma…" }),
+        "Vacío = usa el subtítulo general."));
       var g = el("div", "ed-grid progs");
       g.appendChild(field("SNIES", input(p.snies, function (v) { p.snies = v.trim(); }, { placeholder: "105047" })));
       g.appendChild(field("Semestres", input(p.semesters, function (v) { p.semesters = v.trim(); }, { placeholder: "8" })));

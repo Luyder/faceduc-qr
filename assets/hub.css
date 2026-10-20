@@ -158,3 +158,29 @@ body.viewer-open { overflow: hidden; }
 @media (min-width: 900px) {
   .viewer { inset: 24px; border-radius: 18px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.25), 0 0 0 100vmax rgba(20,20,20,.45); }
 }
+
+/* ---------- texto oficial de la licenciatura ---------- */
+.hub-head .subtitle.tagline {
+  font-style: normal; font-weight: 400; font-size: 18px; line-height: 1.45; letter-spacing: 0; color: var(--ink-2);
+  max-width: 480px; text-wrap: pretty;
+}
+
+/* ---------- sello de la beca (como el de los folletos) ---------- */
+/* flota a la derecha del texto de la licenciatura; el texto lo rodea */
+.hub-head::after { content: ""; display: table; clear: both; }
+.seal {
+  float: right; shape-outside: circle(50%); shape-margin: 6px;
+  position: relative; width: 112px; height: 112px; margin: 2px -6px 6px 10px;
+  display: grid; place-items: center; text-decoration: none; color: #fff;
+  transform: rotate(-12deg); transition: transform .2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (min-width: 700px) { .seal { width: 128px; height: 128px; margin-right: -40px; } }
+.seal svg { position: absolute; inset: 0; width: 100%; height: 100%; fill: #d42e2b; filter: drop-shadow(0 6px 10px rgba(212, 46, 43, .25)); }
+.seal:hover, .seal:focus-visible { transform: rotate(-4deg) scale(1.05); outline: none; }
+.seal:focus-visible svg { stroke: var(--ink); stroke-width: 4; }
+.seal-text { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; line-height: 1; }
+.seal-l1 { font: italic 500 11.5px/1.15 var(--serif); max-width: 76px; }
+.seal-big { font: italic 700 32px/1 var(--serif); letter-spacing: -.03em; margin: 2px 0 1px; }
+.seal-l2 { font: italic 500 10px var(--serif); }
+@media (min-width: 700px) { .seal-l1 { font-size: 12.5px; max-width: 86px; } .seal-big { font-size: 38px; } .seal-l2 { font-size: 11px; } }

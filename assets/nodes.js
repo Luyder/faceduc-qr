@@ -61,7 +61,7 @@
         if (!program && l.homeLabel) copy.label = l.homeLabel;   // texto distinto en la página principal
         return copy;
       })
-      .filter(function (l) { return /^(https?:|mailto:|tel:)/i.test(l.url); });
+      .filter(function (l) { return /^(https?:|mailto:|tel:)|^(?!\/)[\w.\/-]+\.html?(\?[^\s#]*)?(#[\w-]*)?$/i.test(l.url); });
   }
 
   // ---------- color: versión legible sobre papel crema ----------

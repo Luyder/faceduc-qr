@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/hub.css?v=20261020b">
-  <script src="config.js?v=20261020b"></script>
+  <link rel="stylesheet" href="assets/hub.css?v=20261020d">
+  <script src="config.js?v=20261020c"></script>
   <script>
     // ?preview=1 → vista previa dentro del editor: no registra visitas ni abre enlaces
     window.QRHUB_PREVIEW = /[?&]preview=1\b/.test(location.search);
@@ -31,6 +31,14 @@
       <div class="avatar" id="avatar" aria-hidden="true"></div>
       <p class="eyebrow" id="eyebrow"></p>
       <h1 id="title"></h1>
+      <a class="seal" id="seal" target="_blank" rel="noopener" hidden>
+        <svg viewBox="0 0 200 200" aria-hidden="true"><polygon id="sealShape"/></svg>
+        <span class="seal-text">
+          <span class="seal-l1" id="sealL1"></span>
+          <span class="seal-big" id="sealBig"></span>
+          <span class="seal-l2" id="sealL2"></span>
+        </span>
+      </a>
       <p class="subtitle" id="subtitle"></p>
     </header>
 
@@ -63,8 +71,8 @@
     <iframe class="viewer-frame" id="viewerFrame" title="Pensum" allow="fullscreen" allowfullscreen></iframe>
   </div>
 
-  <script src="assets/nodes.js?v=20261020b"></script>
-  <script src="assets/tracker.js?v=20261020b"></script>
+  <script src="assets/nodes.js?v=20261020c"></script>
+  <script src="assets/tracker.js?v=20261020c"></script>
   <script>
     /* Respaldo fijo: si config.js se borra o queda con un error al editarlo,
        la página no queda en blanco y los QR impresos siguen llevando a algún lugar. */
@@ -74,7 +82,7 @@
       var nav = document.getElementById("links");
       var more = document.getElementById("more"), moreNav = document.getElementById("moreLinks");
       var N = window.QRNodes;
-      var URL_OK = /^(https?:|mailto:|tel:)/i;
+      var URL_OK = /^(https?:|mailto:|tel:)|^(?!\/)[\w.\/-]+\.html?(\?[^\s#]*)?(#[\w-]*)?$/i;
 
       function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
 
@@ -128,7 +136,8 @@
           h1.appendChild(document.createTextNode("Licenciatura "));
           h1.appendChild(el("em", null, "en " + program.name));
           eb.textContent = C.title || "";
-          sub.textContent = C.subtitle || "";
+          sub.textContent = program.tagline || C.subtitle || "";
+          sub.classList.toggle("tagline", !!program.tagline);
           document.title = "Licenciatura en " + program.name;
         } else if (chooser) {
           h1.appendChild(document.createTextNode("Licenciaturas"));
@@ -142,6 +151,8 @@
           document.title = C.title || "Enlaces";
         }
         eb.hidden = !eb.textContent;
+        if (!program) sub.classList.remove("tagline");
+        renderSeal(C.badge);
 
         var facts = document.getElementById("facts");
         var f = program ? [program.semesters && program.semesters + " semestres", program.credits && program.credits + " créditos", program.snies && "SNIES " + program.snies].filter(Boolean) : [];
@@ -168,6 +179,31 @@
           more.hidden = true;
         }
         if (!shown) nav.appendChild(button(FALLBACK));
+      }
+
+      // ---------- sello de la beca (como el de los folletos) ----------
+      (function () {
+        var pts = [], n = 22;
+        for (var i = 0; i < n * 2; i++) {
+          var r = i % 2 ? 84 : 98, a = Math.PI * i / n - Math.PI / 2;
+          pts.push((100 + r * Math.cos(a)).toFixed(1) + "," + (100 + r * Math.sin(a)).toFixed(1));
+        }
+        document.getElementById("sealShape").setAttribute("points", pts.join(" "));
+      })();
+      function renderSeal(b) {
+        var seal = document.getElementById("seal");
+        var ok = b && b.show !== false && (b.big || b.line1) && URL_OK.test(b.url || "");
+        seal.hidden = !ok;
+        if (!ok) return;
+        seal.href = b.url;
+        document.getElementById("sealL1").textContent = b.line1 || "";
+        document.getElementById("sealBig").textContent = b.big || "";
+        document.getElementById("sealL2").textContent = b.line2 || "";
+        seal.setAttribute("aria-label", b.label || [b.line1, b.big, b.line2].join(" "));
+        seal.onclick = function (e) {
+          if (window.QRHUB_PREVIEW) { e.preventDefault(); return; }
+          if (window.QRHub) QRHub.trackClick({ id: "sello-beca", label: b.label || "Sello beca", url: b.url });
+        };
       }
 
       function linkList(C, program) {
