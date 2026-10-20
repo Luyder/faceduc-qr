@@ -189,7 +189,8 @@ body.viewer-open { overflow: hidden; }
 @media (min-width: 700px) { .seal-l1 { font-size: 17px; max-width: 86px; } .seal-big { font-size: 54px; } .seal-l2 { font-size: 10px; } }
 
 /* ---------- logo de la Universidad y la Facultad ---------- */
-.brand { display: block; width: auto; height: 40px; max-width: 70%; margin: 0 0 26px; }
+/* align-self: el logo nunca se estira dentro de columnas flexibles; object-fit conserva su proporción */
+.brand { display: block; align-self: flex-start; flex: none; width: auto; height: 40px; max-width: 70%; object-fit: contain; object-position: left center; margin: 0 0 26px; }
 @media (min-width: 700px) { .brand { height: 46px; margin-bottom: 32px; } }
 
 /* ---------- sello con la imagen del diseño ---------- */
