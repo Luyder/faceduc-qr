@@ -9,9 +9,9 @@
   <meta name="theme-color" content="#f7f4ec">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/hub.css?v=20261020d">
-  <script src="config.js?v=20261020c"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/hub.css?v=20261020g">
+  <script src="config.js?v=20261020g"></script>
   <script>
     // ?preview=1 → vista previa dentro del editor: no registra visitas ni abre enlaces
     window.QRHUB_PREVIEW = /[?&]preview=1\b/.test(location.search);
@@ -71,8 +71,8 @@
     <iframe class="viewer-frame" id="viewerFrame" title="Pensum" allow="fullscreen" allowfullscreen></iframe>
   </div>
 
-  <script src="assets/nodes.js?v=20261020c"></script>
-  <script src="assets/tracker.js?v=20261020c"></script>
+  <script src="assets/nodes.js?v=20261020f"></script>
+  <script src="assets/tracker.js?v=20261020f"></script>
   <script>
     /* Respaldo fijo: si config.js se borra o queda con un error al editarlo,
        la página no queda en blanco y los QR impresos siguen llevando a algún lugar. */
@@ -183,9 +183,10 @@
 
       // ---------- sello de la beca (como el de los folletos) ----------
       (function () {
-        var pts = [], n = 22;
+        // 24 picos marcados, como el sello de los folletos
+        var pts = [], n = 24;
         for (var i = 0; i < n * 2; i++) {
-          var r = i % 2 ? 84 : 98, a = Math.PI * i / n - Math.PI / 2;
+          var r = i % 2 ? 80 : 99, a = Math.PI * i / n - Math.PI / 2;
           pts.push((100 + r * Math.cos(a)).toFixed(1) + "," + (100 + r * Math.sin(a)).toFixed(1));
         }
         document.getElementById("sealShape").setAttribute("points", pts.join(" "));

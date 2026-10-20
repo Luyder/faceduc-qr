@@ -26,7 +26,7 @@
   --s0: #efebe0; --s1: #e0e6fa; --s2: #c1cdf6; --s3: #93a8ef; --s4: #6582e6;
   --s5: #3d5fd8; --s6: #2347c5; --s7: #152f8f;
 
-  --serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --serif: "Gelasio", Georgia, "Times New Roman", serif;
   --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 @media (prefers-color-scheme: dark) {

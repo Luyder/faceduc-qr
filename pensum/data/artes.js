@@ -256,7 +256,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2007.webp"
   },
   {
    "id": "educ2010",
@@ -293,7 +294,8 @@ window.PENSUM = {
     "Para cursarlo es necesario haber aprobado Investigación en educación y Práctica formativa 1."
    ],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2011.webp"
   },
   {
    "id": "educ1100",
@@ -309,7 +311,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-1100.webp"
   },
   {
    "id": "educ3107",
@@ -325,7 +328,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-3107.webp"
   },
   {
    "id": "educ3108",
@@ -341,7 +345,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-3108.webp"
   },
   {
    "id": "educ4118",
@@ -373,7 +378,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-1103.webp"
   },
   {
    "id": "educ2104",
@@ -389,7 +395,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2104.webp"
   },
   {
    "id": "educ2102",
@@ -428,7 +435,8 @@ window.PENSUM = {
     "Para cursarlo es necesario haber aprobado Práctica formativa 1."
    ],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2103.webp"
   },
   {
    "id": "educ3103",
@@ -446,7 +454,8 @@ window.PENSUM = {
    ],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-3103.webp"
   },
   {
    "id": "educ3104",
@@ -464,7 +473,8 @@ window.PENSUM = {
    ],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-3104.webp"
   },
   {
    "id": "educ2201",
@@ -485,7 +495,8 @@ window.PENSUM = {
     "label": "Lineamientos de prácticas",
     "url": "https://educacion.uniandes.edu.co/sites/default/files/educacion/Archivos/Pregrados/lineamiemto-practicas.pdf"
    },
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2201.webp"
   },
   {
    "id": "educ2202",
@@ -508,7 +519,8 @@ window.PENSUM = {
     "label": "Lineamientos de prácticas",
     "url": "https://educacion.uniandes.edu.co/sites/default/files/educacion/Archivos/Pregrados/lineamiemto-practicas.pdf"
    },
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2202.webp"
   },
   {
    "id": "educ2203",
@@ -529,7 +541,8 @@ window.PENSUM = {
     "label": "Lineamientos de prácticas",
     "url": "https://educacion.uniandes.edu.co/sites/default/files/educacion/Archivos/Pregrados/lineamiemto-practicas.pdf"
    },
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2203.webp"
   },
   {
    "id": "educ3105",
@@ -558,7 +571,8 @@ window.PENSUM = {
     "label": "Lineamientos de prácticas",
     "url": "https://educacion.uniandes.edu.co/sites/default/files/educacion/Archivos/Pregrados/lineamiemto-practicas.pdf"
    },
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-3105.webp"
   },
   {
    "id": "educ3106",
@@ -583,7 +597,8 @@ window.PENSUM = {
     "label": "Lineamientos de prácticas",
     "url": "https://educacion.uniandes.edu.co/sites/default/files/educacion/Archivos/Pregrados/lineamiemto-practicas.pdf"
    },
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-3106.webp"
   },
   {
    "id": "arte1161",
@@ -598,8 +613,12 @@ window.PENSUM = {
    "pre": [],
    "co": [],
    "notes": [],
-   "link": null,
-   "kind": "curso"
+   "link": {
+    "label": "Ver el curso en la Facultad de Artes y Humanidades",
+    "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/fundamentos-de-dibujo/"
+   },
+   "kind": "curso",
+   "img": "img/ARTE-1161.jpg"
   },
   {
    "id": "arte1162",
@@ -614,8 +633,12 @@ window.PENSUM = {
    "pre": [],
    "co": [],
    "notes": [],
-   "link": null,
-   "kind": "curso"
+   "link": {
+    "label": "Ver el curso en la Facultad de Artes y Humanidades",
+    "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/introduccion-a-la-fotografia/"
+   },
+   "kind": "curso",
+   "img": "img/ARTE-1162.jpg"
   },
   {
    "id": "arte1164",
@@ -630,8 +653,12 @@ window.PENSUM = {
    "pre": [],
    "co": [],
    "notes": [],
-   "link": null,
-   "kind": "curso"
+   "link": {
+    "label": "Ver el curso en la Facultad de Artes y Humanidades",
+    "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/escultura-procesos-y-materiales/"
+   },
+   "kind": "curso",
+   "img": "img/ARTE-1164.jpg"
   },
   {
    "id": "arte1163",
@@ -646,8 +673,12 @@ window.PENSUM = {
    "pre": [],
    "co": [],
    "notes": [],
-   "link": null,
-   "kind": "curso"
+   "link": {
+    "label": "Ver el curso en la Facultad de Artes y Humanidades",
+    "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/fundamentos-de-pintura/"
+   },
+   "kind": "curso",
+   "img": "img/ARTE-1163.jpg"
   },
   {
    "id": "cbuh1003",
@@ -662,8 +693,12 @@ window.PENSUM = {
    "pre": [],
    "co": [],
    "notes": [],
-   "link": null,
-   "kind": "curso"
+   "link": {
+    "label": "Ver el curso en la Facultad de Artes y Humanidades",
+    "url": "https://artehum.uniandes.edu.co/pregrado/hart/cursos/arte-en-colombia/"
+   },
+   "kind": "curso",
+   "img": "img/CBUH-1003.jpg"
   },
   {
    "id": "arte1253",
@@ -678,8 +713,12 @@ window.PENSUM = {
    "pre": [],
    "co": [],
    "notes": [],
-   "link": null,
-   "kind": "curso"
+   "link": {
+    "label": "Ver el curso en la Facultad de Artes y Humanidades",
+    "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/video-y-performance/"
+   },
+   "kind": "curso",
+   "img": "img/ARTE-1253.jpg"
   },
   {
    "id": "arte1252",
@@ -694,8 +733,12 @@ window.PENSUM = {
    "pre": [],
    "co": [],
    "notes": [],
-   "link": null,
-   "kind": "curso"
+   "link": {
+    "label": "Ver el curso en la Facultad de Artes y Humanidades",
+    "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/herramientas-de-sonido/"
+   },
+   "kind": "curso",
+   "img": "img/ARTE-1252.jpg"
   },
   {
    "id": "cbuh1015",
@@ -710,8 +753,12 @@ window.PENSUM = {
    "pre": [],
    "co": [],
    "notes": [],
-   "link": null,
-   "kind": "curso"
+   "link": {
+    "label": "Ver el curso en la Facultad de Artes y Humanidades",
+    "url": "https://artehum.uniandes.edu.co/pregrado/hart/cursos/historias-del-arte/"
+   },
+   "kind": "curso",
+   "img": "img/CBUH-1015.jpg"
   },
   {
    "id": "arte1255",
@@ -726,8 +773,12 @@ window.PENSUM = {
    "pre": [],
    "co": [],
    "notes": [],
-   "link": null,
-   "kind": "curso"
+   "link": {
+    "label": "Ver el curso en la Facultad de Artes y Humanidades",
+    "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/expresion-experimental-audiovisual/"
+   },
+   "kind": "curso",
+   "img": "img/ARTE-1255.jpg"
   },
   {
    "id": "arte1254",
@@ -742,8 +793,12 @@ window.PENSUM = {
    "pre": [],
    "co": [],
    "notes": [],
-   "link": null,
-   "kind": "curso"
+   "link": {
+    "label": "Ver el curso en la Facultad de Artes y Humanidades",
+    "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/objetos-activos-y-electricidad/"
+   },
+   "kind": "curso",
+   "img": "img/ARTE-1254.jpg"
   },
   {
    "id": "elec1",

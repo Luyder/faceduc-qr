@@ -16,7 +16,7 @@
   if (!/^[a-z0-9-]+$/.test(slug)) { fail("No se indicó qué pensum mostrar."); return; }
 
   var s = document.createElement("script");
-  s.src = "data/" + slug + ".js?v=20261020a";
+  s.src = "data/" + slug + ".js?v=20261020j";
   s.onload = function () { window.PENSUM ? init(window.PENSUM) : fail("El pensum no tiene datos."); };
   s.onerror = function () { fail("Este pensum todavía no está disponible."); };
   document.head.appendChild(s);
@@ -29,8 +29,11 @@
 
   function init(data) {
     P = data;
-    document.documentElement.style.setProperty("--lic", P.color);
-    document.documentElement.style.setProperty("--lic-ink", P.ink || P.color);
+    var root = document.documentElement.style;
+    root.setProperty("--lic", P.color);
+    root.setProperty("--lic-ink", P.ink || darken(P.color, 4.5));
+    root.setProperty("--lic-display", darken(P.color, 3));
+    root.setProperty("--on-lic", contrast(rgb(P.color), [255, 255, 255]) >= 2.6 ? "#fff" : "#141414");
     document.title = "Plan de estudios · " + P.program;
     var t = $("#title"); t.textContent = "";
     t.appendChild(document.createTextNode("Licenciatura "));
@@ -52,6 +55,16 @@
     if (h && byId[h]) open(h);
   }
 
+  // ---------- color: contraste sobre el papel crema ----------
+  function rgb(h) { var n = parseInt(String(h).replace("#", ""), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+  function lum(c) { c = c.map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+  function contrast(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  function darken(h, min) {
+    var c = rgb(h), paper = [247, 244, 236];
+    for (var i = 0; i < 25 && contrast(c, paper) < min; i++) c = c.map(function (v) { return v * 0.9; });
+    return "#" + c.map(function (v) { return ("0" + Math.round(v).toString(16)).slice(-2); }).join("");
+  }
+
   function areaOf(c) {
     if (c.area === P.langs.id) return P.langs;
     for (var i = 0; i < P.areas.length; i++) if (P.areas[i].id === c.area) return P.areas[i];
@@ -67,6 +80,10 @@
     b.style.setProperty("--ac", a.color);
     b.style.gridColumn = String(c.sem + 1);
     b.style.gridRow = String(c.row);
+    if (c.img) {
+      var th = el("img", "c-img"); th.src = c.img; th.alt = ""; th.loading = "lazy"; th.decoding = "async";
+      b.appendChild(th); b.classList.add("has-img");
+    }
     b.appendChild(el("span", "c-name", c.short));
     if (c.code) b.appendChild(el("span", "c-code", c.code));
     if (c.credits != null) b.appendChild(el("span", "c-cr", String(c.credits)));
@@ -194,6 +211,10 @@
     $("#sTitle").textContent = c.name;
     $("#sMeta").textContent = [c.code, c.credits != null ? c.credits + (c.credits === 1 ? " crédito" : " créditos") : "", "Semestre " + c.sem].filter(Boolean).join(" · ");
 
+    var media = $("#sMedia");
+    media.textContent = "";
+    media.hidden = !c.img;
+    if (c.img) { var im = el("img"); im.src = c.img; im.alt = "Foto del curso " + c.name; media.appendChild(im); }
     var body = $("#sBody"); body.textContent = "";
     if (c.desc) c.desc.split(/\n+/).forEach(function (p) { if (p.trim()) body.appendChild(el("p", null, p.trim())); });
     else body.appendChild(el("p", "muted", "Pronto agregaremos la descripción de este curso."));

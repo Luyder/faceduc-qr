@@ -41,7 +41,7 @@ Los ids de las licenciaturas (`artes`, `biologia`, `infantil`, `espanol-filologi
 
 ### Pensum interactivo
 
-`pensum/ver.html?p=artes` muestra el plan de estudios de Artes con el diseño hecho en Figma: al tocar un curso aparece su descripción, créditos y requisitos, y se resaltan los cursos que van antes, a la par y después. En celular se ve un semestre a la vez. Los datos están en `pensum/data/artes.js` (descripciones tomadas del pensum oficial en Genially). Para otra licenciatura: crea `pensum/data/<id>.js` con la misma estructura y pon `pensum: "pensum/ver.html?p=<id>"` en `config.js`.
+`pensum/ver.html?p=artes` muestra el plan de estudios de Artes con el diseño hecho en Figma: al tocar un curso aparece su descripción, créditos y requisitos, y se resaltan los cursos que van antes, a la par y después. En celular se ve un semestre a la vez. Hay uno por licenciatura (`pensum/data/<id>.js`): cursos, créditos y descripciones vienen de los pensums oficiales en Genially; el de Artes sigue el diseño hecho en Figma. Las fotos (`pensum/img/`) son las del portal de oferta de cursos de la Facultad (cursos EDUC) y las fichas oficiales de la Facultad de Artes y Humanidades (talleres de Arte, Historia del arte y Literatura).
 
 ## 1. Configura tus enlaces
 
