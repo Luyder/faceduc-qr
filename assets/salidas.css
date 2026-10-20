@@ -1,10 +1,14 @@
 /* Página «Salidas de campo»: misma base que la página pública (hub.css) */
 .trip { padding-top: 40px; }
-.back {
-  align-self: flex-start; margin-bottom: 22px; font: 600 13px var(--sans); color: var(--ink-2); text-decoration: none;
-  border-bottom: 1.5px solid transparent;
+/* botón para volver (arriba y al final) */
+.back, .back-bottom {
+  display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink);
+  border: 1.5px solid var(--rule); border-radius: 999px; font: 600 14px var(--sans);
+  transition: background-color .15s ease, color .15s ease;
 }
-.back:hover, .back:focus-visible { color: var(--lic-ink); border-bottom-color: currentColor; outline: none; }
+.back { align-self: flex-start; margin-bottom: 26px; padding: 8px 16px 8px 13px; background: var(--paper); position: relative; z-index: 2; }
+.back-bottom { justify-content: center; margin-top: 30px; padding: 13px 18px; }
+.back:hover, .back:focus-visible, .back-bottom:hover, .back-bottom:focus-visible { background: var(--ink); color: var(--paper); outline: none; }
 .trip .hub-head h1 em { display: block; font-style: italic; color: var(--lic-ink); }
 .lead { margin: 0; font: 400 20px/1.4 var(--serif); color: var(--ink-2); max-width: 460px; }
 
@@ -31,9 +35,9 @@
 .tour-media { position: relative; display: block; aspect-ratio: 16 / 9; background: #2a2a28; }
 .tour-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .tour-badge {
-  position: absolute; top: 12px; right: 12px; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center;
-  background: var(--red); color: #f6f1e3; font: italic 600 19px var(--serif); transform: rotate(10deg);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, .25);
+  position: absolute; left: 12px; bottom: 12px; display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(20, 20, 20, .72); color: #fff; border-radius: 999px; padding: 6px 12px 6px 10px;
+  font: 600 12.5px var(--sans); backdrop-filter: blur(4px);
 }
 .tour-body { display: flex; flex-direction: column; gap: 4px; padding: 16px 18px 18px; }
 .tour-eyebrow { font: 600 11.5px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--lic-ink); }
@@ -45,4 +49,13 @@
 }
 .tour:hover .tour-cta { background: var(--lic-ink); }
 
-.trip-more { margin-top: 30px; }
+/* preguntas: botones secundarios, sin numeración */
+.trip-help { margin-top: 34px; padding-top: 18px; border-top: 1.5px solid var(--rule); }
+.trip-help h2 { margin: 0 0 14px; font: italic 600 22px var(--serif); letter-spacing: -.01em; }
+.trip-buttons { display: flex; flex-direction: column; gap: 10px; }
+.trip-btn {
+  display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: var(--ink);
+  background: #fffdf8; border-radius: 12px; padding: 14px 16px; font: 500 17px var(--serif);
+  box-shadow: 0 0 0 1px rgba(20, 20, 20, .10);
+}
+.trip-btn:hover, .trip-btn:focus-visible { box-shadow: 0 0 0 2px var(--lic-ink); outline: none; }

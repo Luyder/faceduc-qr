@@ -10,9 +10,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/hub.css?v=20261020s">
-  <link rel="stylesheet" href="assets/salidas.css?v=20261020s">
-  <script src="config.js?v=20261020s"></script>
+  <link rel="stylesheet" href="assets/hub.css?v=20261020t">
+  <link rel="stylesheet" href="assets/salidas.css?v=20261020t">
+  <script src="config.js?v=20261020t"></script>
 </head>
 <body class="page-salidas">
   <div class="blob-wrap" aria-hidden="true">
@@ -25,7 +25,7 @@
   </div>
 
   <main class="hub trip">
-    <a class="back" id="back" href="index.html">← Volver</a>
+    <a class="back" id="back" href="index.html"><span aria-hidden="true">←</span> <span id="backText">Volver</span></a>
     <img class="brand" src="assets/logo-uniandes-educacion.png" width="1000" height="217" alt="Universidad de los Andes · Facultad de Educación">
 
     <header class="hub-head">
@@ -51,7 +51,7 @@
     <a class="tour" id="tour" target="_blank" rel="noopener">
       <span class="tour-media">
         <img id="tourImg" alt="" width="720" height="405">
-        <span class="tour-badge">360°</span>
+        <span class="tour-badge"><span aria-hidden="true">↻</span> Vista 360°</span>
       </span>
       <span class="tour-body">
         <span class="tour-eyebrow">Recorrido virtual</span>
@@ -61,7 +61,12 @@
       </span>
     </a>
 
-    <nav class="links trip-more" id="more" aria-label="Más información"></nav>
+    <section class="trip-help" id="help">
+      <h2>¿Tienes preguntas?</h2>
+      <div class="trip-buttons" id="more"></div>
+    </section>
+
+    <a class="back-bottom" id="backBottom" href="index.html"><span aria-hidden="true">←</span> <span id="backBottomText">Volver al inicio</span></a>
 
     <footer class="hub-foot">
       <div class="shapes" aria-hidden="true"><i class="s1"></i><i class="s2"></i><i class="s3"></i><i class="s4"></i><i class="s5"></i></div>
@@ -69,8 +74,8 @@
     </footer>
   </main>
 
-  <script src="assets/nodes.js?v=20261020s"></script>
-  <script src="assets/tracker.js?v=20261020s"></script>
+  <script src="assets/nodes.js?v=20261020t"></script>
+  <script src="assets/tracker.js?v=20261020t"></script>
   <script>
     (function () {
       var C = window.HUB_CONFIG || {};
@@ -87,8 +92,13 @@
       // volver al nodo con la misma licenciatura y el mismo origen del QR
       var back = new URLSearchParams();
       ["lic", "src", "utm_campaign"].forEach(function (k) { if (q.get(k)) back.set(k, q.get(k)); });
-      document.getElementById("back").href = "index.html" + (back.toString() ? "?" + back.toString() : "");
-      if (program) document.getElementById("back").textContent = "← Licenciatura en " + program.name;
+      var backHref = "index.html" + (back.toString() ? "?" + back.toString() : "");
+      document.getElementById("back").href = backHref;
+      document.getElementById("backBottom").href = backHref;
+      if (program) {
+        document.getElementById("backText").textContent = "Licenciatura en " + program.name;
+        document.getElementById("backBottomText").textContent = "Volver a Licenciatura en " + program.name;
+      }
 
       document.getElementById("privacy").textContent = C.privacyNote || "";
 
@@ -109,13 +119,13 @@
       var list = N ? N.linksFor(C, program) : [];
       list.filter(function (l) { return /asesor|becas/i.test(l.id + " " + l.label) && !l.embed; }).forEach(function (l) {
         var a = document.createElement("a");
-        a.className = "link"; a.href = l.url; a.target = "_blank"; a.rel = "noopener";
-        var t = document.createElement("span"); t.className = "label"; t.textContent = l.label; a.appendChild(t);
-        var ar = document.createElement("span"); ar.className = "arrow"; ar.setAttribute("aria-hidden", "true"); ar.textContent = "→"; a.appendChild(ar);
+        a.className = "trip-btn"; a.href = l.url; a.target = "_blank"; a.rel = "noopener";
+        a.textContent = l.label;
+        var ar = document.createElement("span"); ar.setAttribute("aria-hidden", "true"); ar.textContent = " ↗"; a.appendChild(ar);
         a.addEventListener("click", function () { if (window.QRHub) QRHub.trackClick(l); });
         more.appendChild(a);
       });
-      more.hidden = !more.children.length;
+      document.getElementById("help").hidden = !more.children.length;
 
       if (window.QRHub) QRHub.start();
     })();
