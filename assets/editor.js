@@ -67,7 +67,7 @@
   function badgeLine(b) {
     b = b || {};
     var o = { show: b.show !== false };
-    ["line1", "big", "line2", "url", "label"].forEach(function (k) { if (b[k]) o[k] = String(b[k]).trim(); });
+    ["image", "line1", "big", "line2", "url", "label"].forEach(function (k) { if (b[k]) o[k] = String(b[k]).trim(); });
     return "{ " + Object.keys(o).map(function (k) { return k + ": " + JSON.stringify(o[k]); }).join(", ") + " }";
   }
   function generate(cfg) {

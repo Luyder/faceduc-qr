@@ -618,7 +618,7 @@ window.PENSUM = {
     "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/fundamentos-de-dibujo/"
    },
    "kind": "curso",
-   "img": "img/ARTE-1161.jpg"
+   "img": "img/ARTE-1161.webp"
   },
   {
    "id": "arte1162",
@@ -638,7 +638,7 @@ window.PENSUM = {
     "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/introduccion-a-la-fotografia/"
    },
    "kind": "curso",
-   "img": "img/ARTE-1162.jpg"
+   "img": "img/ARTE-1162.webp"
   },
   {
    "id": "arte1164",
@@ -658,7 +658,7 @@ window.PENSUM = {
     "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/escultura-procesos-y-materiales/"
    },
    "kind": "curso",
-   "img": "img/ARTE-1164.jpg"
+   "img": "img/ARTE-1164.webp"
   },
   {
    "id": "arte1163",
@@ -678,7 +678,7 @@ window.PENSUM = {
     "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/fundamentos-de-pintura/"
    },
    "kind": "curso",
-   "img": "img/ARTE-1163.jpg"
+   "img": "img/ARTE-1163.webp"
   },
   {
    "id": "cbuh1003",
@@ -698,7 +698,7 @@ window.PENSUM = {
     "url": "https://artehum.uniandes.edu.co/pregrado/hart/cursos/arte-en-colombia/"
    },
    "kind": "curso",
-   "img": "img/CBUH-1003.jpg"
+   "img": "img/CBUH-1003.webp"
   },
   {
    "id": "arte1253",
@@ -718,7 +718,7 @@ window.PENSUM = {
     "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/video-y-performance/"
    },
    "kind": "curso",
-   "img": "img/ARTE-1253.jpg"
+   "img": "img/ARTE-1253.webp"
   },
   {
    "id": "arte1252",
@@ -738,7 +738,7 @@ window.PENSUM = {
     "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/herramientas-de-sonido/"
    },
    "kind": "curso",
-   "img": "img/ARTE-1252.jpg"
+   "img": "img/ARTE-1252.webp"
   },
   {
    "id": "cbuh1015",
@@ -758,7 +758,7 @@ window.PENSUM = {
     "url": "https://artehum.uniandes.edu.co/pregrado/hart/cursos/historias-del-arte/"
    },
    "kind": "curso",
-   "img": "img/CBUH-1015.jpg"
+   "img": "img/CBUH-1015.webp"
   },
   {
    "id": "arte1255",
@@ -778,7 +778,7 @@ window.PENSUM = {
     "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/expresion-experimental-audiovisual/"
    },
    "kind": "curso",
-   "img": "img/ARTE-1255.jpg"
+   "img": "img/ARTE-1255.webp"
   },
   {
    "id": "arte1254",
@@ -798,7 +798,7 @@ window.PENSUM = {
     "url": "https://artehum.uniandes.edu.co/pregrado/art/cursos/objetos-activos-y-electricidad/"
    },
    "kind": "curso",
-   "img": "img/ARTE-1254.jpg"
+   "img": "img/ARTE-1254.webp"
   },
   {
    "id": "elec1",

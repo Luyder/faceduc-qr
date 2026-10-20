@@ -16,7 +16,7 @@
   if (!/^[a-z0-9-]+$/.test(slug)) { fail("No se indicó qué pensum mostrar."); return; }
 
   var s = document.createElement("script");
-  s.src = "data/" + slug + ".js?v=20261020j";
+  s.src = "data/" + slug + ".js?v=20261020n";
   s.onload = function () { window.PENSUM ? init(window.PENSUM) : fail("El pensum no tiene datos."); };
   s.onerror = function () { fail("Este pensum todavía no está disponible."); };
   document.head.appendChild(s);
@@ -81,7 +81,7 @@
     b.style.gridColumn = String(c.sem + 1);
     b.style.gridRow = String(c.row);
     if (c.img) {
-      var th = el("img", "c-img"); th.src = c.img; th.alt = ""; th.loading = "lazy"; th.decoding = "async";
+      var th = el("img", "c-img"); th.src = c.img; th.alt = ""; th.decoding = "async";   // fotos livianas (≈20 KB): carga inmediata
       b.appendChild(th); b.classList.add("has-img");
     }
     b.appendChild(el("span", "c-name", c.short));

@@ -85,7 +85,7 @@ window.PENSUM = {
     "url": "https://artehum.uniandes.edu.co/pregrado/lite/cursos/introduccion-a-los-estudios-literarios/"
    },
    "kind": "curso",
-   "img": "img/LITE-1100.jpg"
+   "img": "img/LITE-1100.webp"
   },
   {
    "id": "ccde1101",
@@ -271,7 +271,7 @@ window.PENSUM = {
     "url": "https://artehum.uniandes.edu.co/pregrado/lite/cursos/linguistica-2-historia-de-la-lengua/"
    },
    "kind": "curso",
-   "img": "img/LITE-2104.jpg"
+   "img": "img/LITE-2104.webp"
   },
   {
    "id": "electivahispanic2",

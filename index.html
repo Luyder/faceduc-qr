@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/hub.css?v=20261020g">
-  <script src="config.js?v=20261020g"></script>
+  <link rel="stylesheet" href="assets/hub.css?v=20261020n">
+  <script src="config.js?v=20261020n"></script>
   <script>
     // ?preview=1 → vista previa dentro del editor: no registra visitas ni abre enlaces
     window.QRHUB_PREVIEW = /[?&]preview=1\b/.test(location.search);
@@ -28,10 +28,12 @@
   </div>
   <main class="hub">
     <header class="hub-head">
+      <img class="brand" src="assets/logo-uniandes-educacion.png" width="1000" height="217" alt="Universidad de los Andes · Facultad de Educación">
       <div class="avatar" id="avatar" aria-hidden="true"></div>
       <p class="eyebrow" id="eyebrow"></p>
       <h1 id="title"></h1>
       <a class="seal" id="seal" target="_blank" rel="noopener" hidden>
+        <img class="seal-img" id="sealImg" alt="" hidden>
         <svg viewBox="0 0 200 200" aria-hidden="true"><polygon id="sealShape"/></svg>
         <span class="seal-text">
           <span class="seal-l1" id="sealL1"></span>
@@ -150,7 +152,7 @@
           sub.textContent = broken ? "" : (C.subtitle || "");
           document.title = C.title || "Enlaces";
         }
-        eb.hidden = !eb.textContent;
+        eb.hidden = true;   // el logo de la Universidad y la Facultad ya lo dice
         if (!program) sub.classList.remove("tagline");
         renderSeal(C.badge);
 
@@ -186,7 +188,7 @@
         // 24 picos marcados, como el sello de los folletos
         var pts = [], n = 24;
         for (var i = 0; i < n * 2; i++) {
-          var r = i % 2 ? 80 : 99, a = Math.PI * i / n - Math.PI / 2;
+          var r = i % 2 ? 82 : 99, a = Math.PI * i / n - Math.PI / 2 + 0.07;
           pts.push((100 + r * Math.cos(a)).toFixed(1) + "," + (100 + r * Math.sin(a)).toFixed(1));
         }
         document.getElementById("sealShape").setAttribute("points", pts.join(" "));
@@ -197,6 +199,11 @@
         seal.hidden = !ok;
         if (!ok) return;
         seal.href = b.url;
+        // si hay imagen del sello (la del diseño), se usa tal cual; si no, se dibuja con texto
+        var img = document.getElementById("sealImg");
+        seal.classList.toggle("has-img", !!b.image);
+        img.hidden = !b.image;
+        if (b.image) img.src = b.image;
         document.getElementById("sealL1").textContent = b.line1 || "";
         document.getElementById("sealBig").textContent = b.big || "";
         document.getElementById("sealL2").textContent = b.line2 || "";

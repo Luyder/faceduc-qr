@@ -30,7 +30,7 @@ window.HUB_CONFIG = {
   facultyPage: "https://educacion.uniandes.edu.co/es/oferta-academica/pregrado",
 
   // Sello como el de los folletos. show: false para ocultarlo
-  badge: { show: true, line1: "Tenemos beca del", big: "66%", line2: "Para todos y todas", url: "https://apoyofinanciero.uniandes.edu.co/decidi-ensenar", label: "Beca Decidí Enseñar: 66% al ser admitido" },
+  badge: { show: true, image: "assets/sello-beca-66.png", line1: "Tenemos beca del", big: "66%", line2: "Para todos y todas", url: "https://apoyofinanciero.uniandes.edu.co/decidi-ensenar", label: "Beca Decidí Enseñar: 66% al ser admitido" },
 
   // Aviso breve de privacidad al pie de la página
   privacyNote: "Registramos datos anónimos de visita (dispositivo, origen y enlace elegido) para mejorar nuestros servicios. No guardamos datos personales.",
