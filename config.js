@@ -34,7 +34,7 @@ window.HUB_CONFIG = {
 
   // Salidas de campo: bloque destacado en todas las páginas y página propia (salidas.html)
   //   tourUrl = visor 360 del espacio que se abre desde esa página
-  fieldTrips: { show: true, eyebrow: "Cada semestre", title: "Salidas de campo", text: "Conoce las realidades del país", url: "salidas.html", tourUrl: "https://luyder.github.io/Prueba3D1/", tourImage: "assets/recorrido-360.webp" },
+  fieldTrips: { show: true, eyebrow: "Cada semestre", title: "Salidas de campo", text: "Conoce las realidades del país", url: "salidas.html", tourUrl: "https://luyder.github.io/Prueba3D1/", tourImage: "assets/recorrido-360.webp?v=2" },
 
   // Aviso breve de privacidad al pie de la página
   privacyNote: "Registramos datos anónimos de visita (dispositivo, origen y enlace elegido) para mejorar nuestros servicios. No guardamos datos personales.",
