@@ -235,3 +235,13 @@ body.viewer-open { overflow: hidden; }
   background: var(--lic-ink); border-color: var(--lic-ink); color: #fff; transform: translateX(2px);
 }
 @media (min-width: 700px) { .feature-title { font-size: 34px; } }
+
+/* ---------- botón a la lista de todas las licenciaturas ---------- */
+.all-lic {
+  display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink);
+  border: 1.5px solid var(--rule); border-radius: 999px; font: 600 14px var(--sans);
+  transition: background-color .15s ease, color .15s ease;
+}
+.all-lic:hover, .all-lic:focus-visible { background: var(--ink); color: var(--paper); outline: none; }
+.all-lic-top { align-self: flex-start; margin: -24px 0 24px; padding: 8px 16px 8px 13px; background: var(--paper); position: relative; z-index: 2; }
+.all-lic-bottom { justify-content: center; margin-top: 26px; padding: 13px 18px; }

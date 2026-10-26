@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/hub.css?v=20261026d">
+  <link rel="stylesheet" href="assets/hub.css?v=20261026e">
   <script src="config.js?v=20261021a"></script>
   <script>
     // ?preview=1 → vista previa dentro del editor: no registra visitas ni abre enlaces
@@ -27,6 +27,7 @@
   </svg>
   </div>
   <main class="hub">
+    <a class="all-lic all-lic-top" id="allTop" hidden><span aria-hidden="true">←</span> Todas las licenciaturas</a>
     <header class="hub-head">
       <img class="brand" src="assets/logo-uniandes-educacion.png" width="1000" height="217" alt="Universidad de los Andes · Facultad de Educación">
       <div class="avatar" id="avatar" aria-hidden="true"></div>
@@ -67,6 +68,8 @@
 
     <p class="redirect" id="redirect" hidden></p>
     <p class="facts" id="facts" hidden></p>
+
+    <a class="all-lic all-lic-bottom" id="allBottom" hidden>Ver todas las licenciaturas <span aria-hidden="true">→</span></a>
 
     <footer class="hub-foot">
       <div class="shapes" aria-hidden="true"><i class="s1"></i><i class="s2"></i><i class="s3"></i><i class="s4"></i><i class="s5"></i></div>
@@ -122,6 +125,24 @@
         root.setProperty("--lic-ink", N ? N.ink(brand, 3) : brand);
       }
 
+      // lista de todas las licenciaturas (la página principal), conservando el origen del QR
+      function hrefAll() {
+        var q = new URLSearchParams(location.search), keep = new URLSearchParams();
+        ["src", "utm_campaign"].forEach(function (k) { if (q.get(k)) keep.set(k, q.get(k)); });
+        return location.pathname + (keep.toString() ? "?" + keep.toString() : "");
+      }
+      function renderAllButtons(show) {
+        ["allTop", "allBottom"].forEach(function (id) {
+          var a = document.getElementById(id);
+          a.hidden = !show;
+          a.href = hrefAll();
+          a.onclick = function (e) {
+            if (window.QRHUB_PREVIEW) { e.preventDefault(); return; }
+            if (window.QRHub) QRHub.trackClick({ id: "todas-licenciaturas", label: "Todas las licenciaturas", url: a.href });
+          };
+        });
+      }
+
       // misma página con otra licenciatura, conservando ?src, ?to y la campaña
       function hrefFor(programId) {
         var q = new URLSearchParams(location.search);
@@ -170,6 +191,7 @@
         if (!program) sub.classList.remove("tagline");
         renderSeal(C.badge);
         renderFeature(C.fieldTrips);
+        renderAllButtons(!!program && programs.length > 1);
 
         var facts = document.getElementById("facts");
         var f = program ? [program.semesters && program.semesters + " semestres", program.credits && program.credits + " créditos", program.snies && "SNIES " + program.snies].filter(Boolean) : [];
