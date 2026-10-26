@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/hub.css?v=20261026c">
+  <link rel="stylesheet" href="assets/hub.css?v=20261026d">
   <script src="config.js?v=20261021a"></script>
   <script>
     // ?preview=1 → vista previa dentro del editor: no registra visitas ni abre enlaces
@@ -46,8 +46,12 @@
 
     <!-- bloque destacado: salidas de campo -->
     <a class="feature" id="feature" hidden>
+      <!-- estampilla, en la línea del sello del 66% -->
+      <span class="feature-stamp" id="featStamp" aria-hidden="true">
+        <svg viewBox="0 0 200 200"><polygon id="stampShape"/></svg>
+        <span id="featEyebrow"></span>
+      </span>
       <span class="feature-text">
-        <span class="feature-eyebrow" id="featEyebrow"></span>
         <span class="feature-title" id="featTitle"></span>
         <span class="feature-sub" id="featText"></span>
         <span class="feature-more">Conoce más <span class="feature-arrow" aria-hidden="true">→</span></span>
@@ -195,6 +199,14 @@
       }
 
       // ---------- salidas de campo (bloque destacado → salidas.html) ----------
+      (function () {   // forma de la estampilla: roseta de 18 puntas suaves
+        var pts = [], n = 18;
+        for (var i = 0; i < n * 2; i++) {
+          var r = i % 2 ? 86 : 99, ang = Math.PI * i / n - Math.PI / 2;
+          pts.push((100 + r * Math.cos(ang)).toFixed(1) + "," + (100 + r * Math.sin(ang)).toFixed(1));
+        }
+        document.getElementById("stampShape").setAttribute("points", pts.join(" "));
+      })();
       function renderFeature(f) {
         var a = document.getElementById("feature");
         var ok = !!(f && f.show !== false && f.title && URL_OK.test(f.url || ""));
@@ -204,6 +216,9 @@
         ["lic", "src", "utm_campaign"].forEach(function (k) { if (q.get(k)) keep.set(k, q.get(k)); });
         a.href = f.url + (keep.toString() ? (f.url.indexOf("?") < 0 ? "?" : "&") + keep.toString() : "");
         document.getElementById("featEyebrow").textContent = f.eyebrow || "";
+        document.getElementById("featStamp").hidden = !f.eyebrow;
+        a.classList.toggle("has-stamp", !!f.eyebrow);
+        a.setAttribute("aria-label", [f.eyebrow, f.title, f.text].filter(Boolean).join(". "));
         document.getElementById("featTitle").textContent = f.title;
         document.getElementById("featText").textContent = f.text || "";
 

@@ -202,7 +202,7 @@ body.viewer-open { overflow: hidden; }
 /* ---------- bloque destacado: salidas de campo ---------- */
 /* sobre el papel, con borde negro fino como los botones del sitio; destaca por el título */
 .feature {
-  display: block; margin: 0 0 26px; padding: 18px 20px 18px;
+  position: relative; display: block; margin: 0 0 26px; padding: 18px 20px 18px;
   background: var(--paper); color: var(--ink); text-decoration: none;
   border: 1.5px solid var(--rule); border-radius: 18px;
   transition: transform .16s ease, background-color .16s ease;
@@ -211,7 +211,18 @@ body.viewer-open { overflow: hidden; }
 .feature:hover, .feature:focus-visible { transform: translateY(-2px); background: #fffdf8; outline: none; }
 .feature:focus-visible { box-shadow: 0 0 0 3px var(--lic-ink); }
 .feature-text { display: flex; flex-direction: column; gap: 3px; }
-.feature-eyebrow { font: 600 11.5px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--lic-ink); }
+/* «Cada semestre» como estampilla inclinada, pegada al borde derecho (como el sello del 66%) */
+.feature.has-stamp { padding-right: 104px; }
+.feature-stamp {
+  position: absolute; top: 50%; right: -12px; width: 104px; height: 104px; margin-top: -52px;
+  display: grid; place-items: center; transform: rotate(10deg); transition: transform .2s ease;
+}
+.feature-stamp svg { position: absolute; inset: 0; width: 100%; height: 100%; fill: #2347c5; }
+.feature-stamp span {
+  position: relative; max-width: 70px; text-align: center; color: #f6f1e3;
+  font: italic 500 17px/1.02 var(--serif); letter-spacing: -.01em;
+}
+.feature:hover .feature-stamp, .feature:focus-visible .feature-stamp { transform: rotate(2deg) scale(1.05); }
 .feature-title { font: italic 700 30px/1.02 var(--serif); letter-spacing: -.025em; }
 .feature-sub { font: 400 17px/1.35 var(--serif); color: var(--ink-2); }
 .feature-more { display: inline-flex; align-items: center; gap: 10px; margin-top: 12px; font: italic 600 16px var(--serif); }
