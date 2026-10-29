@@ -140,7 +140,7 @@
       var b = el("button", "sem-tab", String(n));
       b.type = "button"; b.dataset.sem = n;
       b.setAttribute("aria-label", "Semestre " + n);
-      b.addEventListener("click", function () { sem = n; applySem(); });
+      b.addEventListener("click", function () { sem = n; applySem(); if (window.QRHub) QRHub.track("semestre", n); });
       nav.appendChild(b);
     })(i);
     nav.appendChild(el("span", "sem-total", ""));
@@ -200,6 +200,7 @@
   var lastFocus = null;
   function open(id) {
     var c = byId[id]; if (!c) return;
+    if (window.QRHub) QRHub.track("curso", [c.code, c.name].filter(Boolean).join(" "));
     selected = id;
     if (mobile.matches && c.sem !== sem) { sem = c.sem; applySem(); }
     highlight(id);

@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/hub.css?v=20261026e">
-  <script src="config.js?v=20261021a"></script>
+  <link rel="stylesheet" href="assets/hub.css?v=20261029a">
+  <script src="config.js?v=20261029d"></script>
   <script>
     // ?preview=1 → vista previa dentro del editor: no registra visitas ni abre enlaces
     window.QRHUB_PREVIEW = /[?&]preview=1\b/.test(location.search);
@@ -90,8 +90,8 @@
     <iframe class="viewer-frame" id="viewerFrame" title="Pensum" allow="fullscreen" allowfullscreen></iframe>
   </div>
 
-  <script src="assets/nodes.js?v=20261020f"></script>
-  <script src="assets/tracker.js?v=20261020f"></script>
+  <script src="assets/nodes.js?v=20261029a"></script>
+  <script src="assets/tracker.js?v=20261029d"></script>
   <script>
     /* Respaldo fijo: si config.js se borra o queda con un error al editarlo,
        la página no queda en blanco y los QR impresos siguen llevando a algún lugar. */
@@ -206,7 +206,8 @@
           programs.forEach(function (p) {
             var a = button({ label: p.name, dot: p.color, ink: N ? N.ink(p.color || "#2347c5", 3) : p.color }, hrefFor(p.id));
             a.addEventListener("click", function (e) {
-              if (window.QRHUB_PREVIEW) { e.preventDefault(); render(C, p.id); }
+              if (window.QRHUB_PREVIEW) { e.preventDefault(); render(C, p.id); return; }
+              if (window.QRHub) QRHub.track("elige-licenciatura", p.id);
             });
             nav.appendChild(a); shown++;
           });
@@ -302,7 +303,9 @@
 
       // ---------- visor del pensum ----------
       var viewer = document.getElementById("viewer"), frame = document.getElementById("viewerFrame"), current = null;
+      var viewerSince = 0, viewerLabel = "";
       function openViewer(l) {
+        viewerSince = Date.now(); viewerLabel = l.id || "";
         document.getElementById("viewerEyebrow").textContent = current ? "Licenciatura en " + current.name : "";
         document.getElementById("viewerTitle").textContent = l.label || "";
         document.getElementById("viewerOpen").href = l.url;
@@ -318,6 +321,9 @@
         if (viewer.hidden) return;
         viewer.hidden = true;
         document.body.classList.remove("viewer-open");
+        // cuánto tiempo estuvo dentro del visor (p. ej. el pensum)
+        if (window.QRHub && viewerSince) QRHub.track("cierra-visor", viewerLabel + "|" + Math.round((Date.now() - viewerSince) / 1000));
+        viewerSince = 0;
         if (!fromHistory && history.state && history.state.viewer) history.back();
       }
       document.getElementById("viewerClose").addEventListener("click", function () { closeViewer(false); });

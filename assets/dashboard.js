@@ -8,7 +8,8 @@
   var $ = function (s) { return document.querySelector(s); };
   var COLUMNS = ["server_ts", "ts", "type", "vid", "sid", "src", "utm_medium", "utm_campaign",
     "link_id", "link_url", "t_to_click_ms", "dwell_ms", "clicks", "new_visitor",
-    "device", "os", "browser", "lang", "tz", "screen", "ref", "country", "city", "page", "node"];
+    "device", "os", "browser", "lang", "tz", "screen", "ref", "country", "city", "page", "node",
+    "action", "detail"];
   var DAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
   function safeLS() { try { localStorage.setItem("__t", "1"); localStorage.removeItem("__t"); return localStorage; } catch (e) { return null; } }
@@ -145,7 +146,8 @@
         isNew: Number(r.new_visitor) === 1,
         device: r.device || "Otro", os: r.os || "Otro", browser: r.browser || "Otro",
         lang: String(r.lang || "").split("-")[0] || "?", country: r.country || "", city: r.city || "",
-        ref: r.ref || "", raw: r
+        ref: r.ref || "", page: String(r.page || ""),
+        action: String(r.action || ""), detail: String(r.detail == null ? "" : r.detail), raw: r
       };
     }).filter(function (e) { return !isNaN(e.t) && e.sid; })
       .sort(function (a, b) { return a.t - b.t; });
@@ -291,6 +293,8 @@
     var geo = countBy(S, function (s) { return s.country ? (s.city ? s.city + ", " : "") + s.country : null; });
     if (geo.length) barList($("#geo"), geo, S.length);
     else { $("#geo").textContent = ""; $("#geo").appendChild(el("p", "empty", "Activa geo: true en config.js para ver país y ciudad.")); }
+    renderJourneys(evts);
+    renderCourses(evts);
     renderRecent(evts);
   }
 
@@ -673,10 +677,71 @@
     });
   }
 
-  var TYPE_LABEL = { visit: "Entrada", click: "Clic", exit: "Salida" };
+  // ---------------- recorridos ----------------
+  function pageLabel(page) {
+    if (/salidas/.test(page)) return "a la página de Salidas de campo";
+    if (/pensum/.test(page)) return "al pensum";
+    return "al nodo";
+  }
+  function stepLabel(e) {
+    var d = e.detail;
+    if (e.type === "visit") return "Entra " + pageLabel(e.page) + (e.node ? " · " + licLabel(e.node) : "") + (e.link ? " (QR directo a " + linkLabel(e.link) + ")" : "");
+    if (e.type === "click") {
+      var l = lookup(C.links, e.link);
+      var where = l ? (l.embed ? "se abre en el visor de la página" : "pestaña nueva")
+        : ({ "recorrido-360": "pestaña nueva", "sello-beca": "pestaña nueva" })[e.link] || "misma pestaña";
+      return "Abre «" + linkLabel(e.link) + "» · " + where;
+    }
+    if (e.type === "exit") return "Sale del sitio o cambia de pestaña" + (e.dwell != null ? " · " + fmtDur(e.dwell) + " de lectura" : "") + (e.link ? "" : " · sin elegir enlace");
+    var parts = d.split("|");
+    switch (e.action) {
+      case "curso": return "Lee la descripción del curso «" + d + "»";
+      case "semestre": return "Cambia al semestre " + d + " del pensum";
+      case "cierra-visor": return "Cierra el visor de «" + linkLabel(parts[0]) + "» tras " + fmtDur(Number(parts[1]) * 1000);
+      case "regresa": return "Vuelve al sitio tras " + fmtDur(Number(parts[0]) * 1000) + (parts[1] ? " fuera (estaba en «" + linkLabel(parts[1]) + "»)" : " fuera");
+      case "elige-licenciatura": return "Elige " + licLabel(d) + " en el selector";
+      case "volver": return "Pulsa «volver» (" + d + ")";
+      default: return e.action + (d ? " · " + d : "");
+    }
+  }
+  function fmtOffset(ms) { var s = Math.max(0, Math.round(ms / 1000)); return "+" + Math.floor(s / 60) + ":" + ("0" + s % 60).slice(-2); }
+  function renderJourneys(evts) {
+    var box = $("#journeys"); box.textContent = "";
+    var by = {}, order = [];
+    evts.forEach(function (e) { if (!by[e.sid]) { by[e.sid] = []; order.push(e.sid); } by[e.sid].push(e); });
+    var list = order.reverse().slice(0, 40);
+    if (!list.length) { box.appendChild(el("p", "empty", "Aún no hay recorridos en este periodo.")); return; }
+    list.forEach(function (sid, i) {
+      var steps = by[sid], f = steps[0], last = steps[steps.length - 1];
+      var node = ""; steps.forEach(function (e) { if (e.node) node = e.node; });
+      var det = el("details", "journey"); if (i === 0) det.open = true;
+      var sum = el("summary");
+      sum.appendChild(el("span", "j-when", f.t.toLocaleString("es-CO", { dateStyle: "short", timeStyle: "short" })));
+      sum.appendChild(el("span", "j-what", srcLabel(f.src) + " → " + (node ? licLabel(node) : "Selector")));
+      sum.appendChild(el("span", "j-meta", f.device + " · " + f.os + " · " + steps.length + " pasos · " + fmtDur(last.t - f.t)));
+      det.appendChild(sum);
+      var ol = el("ol", "j-steps");
+      steps.forEach(function (e) {
+        var li = el("li", "j-" + e.type);
+        li.appendChild(el("span", "j-t", fmtOffset(e.t - f.t)));
+        li.appendChild(el("span", "j-l", stepLabel(e)));
+        ol.appendChild(li);
+      });
+      det.appendChild(ol);
+      box.appendChild(det);
+    });
+  }
+  function renderCourses(evts) {
+    var cs = evts.filter(function (e) { return e.type === "action" && e.action === "curso" && e.detail; });
+    var rows = countBy(cs, function (e) { return (e.node ? licLabel(e.node) + " · " : "") + e.detail; }).slice(0, 15);
+    if (rows.length) barList($("#courses"), rows, cs.length);
+    else { $("#courses").textContent = ""; $("#courses").appendChild(el("p", "empty", "Nadie ha abierto cursos del pensum en este periodo.")); }
+  }
+
+  var TYPE_LABEL = { visit: "Entrada", click: "Clic", exit: "Salida", action: "Acción" };
   function renderRecent(evts) {
     var t = $("#recent"); t.textContent = "";
-    headRow(t, [["Fecha"], ["Evento"], ["Licenciatura"], ["Entrada"], ["Enlace"], ["Dispositivo"], ["Navegador"], ["Permanencia", 1], ["Sesión"]]);
+    headRow(t, [["Fecha"], ["Evento"], ["Licenciatura"], ["Entrada"], ["Enlace / acción"], ["Dispositivo"], ["Navegador"], ["Permanencia", 1], ["Sesión"]]);
     var tb = el("tbody");
     evts.slice(-150).reverse().forEach(function (e) {
       var tr = el("tr");
@@ -684,7 +749,7 @@
       var td = cell(tr, ""); td.appendChild(el("span", "pill", TYPE_LABEL[e.type] || e.type));
       cell(tr, e.node ? licLabel(e.node) : "—");
       cell(tr, srcLabel(e.src));
-      cell(tr, e.link ? linkLabel(e.link) : (e.type === "exit" ? "(sin elegir)" : ""));
+      cell(tr, e.type === "action" ? stepLabel(e) : e.link ? linkLabel(e.link) : (e.type === "exit" ? "(sin elegir)" : ""));
       cell(tr, e.device + " · " + e.os);
       cell(tr, e.browser);
       cell(tr, e.dwell != null ? fmtDur(e.dwell) : "", 1);
@@ -746,6 +811,18 @@
         var link = pick(links);
         out.push(Object.assign({ type: "click", ts: new Date(t.getTime() + ttc).toISOString(), link_id: link, t_to_click_ms: ttc, clicks: 1 }, common));
         dwell = ttc + 300;
+        var at = ttc, act = function (a, d, gap) { at += gap; out.push(Object.assign({ type: "action", ts: new Date(t.getTime() + at).toISOString(), action: a, detail: d }, common)); };
+        if (link === "programa") {
+          var nc = 1 + Math.floor(rnd() * 4);
+          if (rnd() < .4) act("semestre", String(2 + Math.floor(rnd() * 6)), 4000);
+          for (var k = 0; k < nc; k++) act("curso", pick(DEMO_COURSES), Math.round(6000 + rnd() * 30000));
+          act("cierra-visor", "programa|" + Math.round((at - ttc) / 1000 + 3), 3000);
+          dwell = at + 2000;
+        } else if (rnd() < .35) {
+          var away = Math.round(8000 + rnd() * 120000);
+          act("regresa", Math.round(away / 1000) + "|" + link, away);
+          dwell = at + Math.round(3000 + rnd() * 20000);
+        }
         out.push(Object.assign({ type: "exit", ts: new Date(t.getTime() + dwell).toISOString(), link_id: link, dwell_ms: dwell, clicks: 1, t_to_click_ms: ttc }, common));
       } else {
         dwell = Math.round(1500 + Math.pow(rnd(), 2.2) * 120000);
@@ -754,6 +831,7 @@
     }
     return out;
   }
+  var DEMO_COURSES = [["EDUC 1101 Fundamentos de la educación", 9], ["ARTE 1201 Taller de dibujo", 6], ["EDUC 2301 Didáctica general", 7], ["EDUC 3401 Práctica pedagógica I", 8], ["EDUC 2101 Desarrollo y aprendizaje", 5], ["EDUC 4501 Proyecto de grado", 4]];
   function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
   // ================================================================

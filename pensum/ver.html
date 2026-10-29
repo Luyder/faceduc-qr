@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="pensum.css?v=20261020k">
+  <link rel="stylesheet" href="pensum.css?v=20261029a">
 </head>
 <body>
   <main class="pen" id="app">
@@ -54,6 +54,14 @@
     </article>
   </div>
 
-  <script src="pensum.js?v=20261020o"></script>
+  <!-- registro: los cursos que la persona consulta (la visita y la salida las mide la página que abre este visor) -->
+  <script>
+    window.QRHUB_NO_EXIT = true;
+    window.QRHUB_NODE = new URLSearchParams(location.search).get("p") || "";
+  </script>
+  <script src="../config.js?v=20261029d"></script>
+  <script src="../assets/nodes.js?v=20261029a"></script>
+  <script src="../assets/tracker.js?v=20261029d"></script>
+  <script src="pensum.js?v=20261029a"></script>
 </body>
 </html>

@@ -18,7 +18,7 @@ window.HUB_CONFIG = {
   accent: "#2347c5",         // color cuando no hay licenciatura elegida
 
   // URL del Web App de Google Apps Script (ver README). Vacío = solo modo prueba en el navegador.
-  endpoint: "",
+  endpoint: "https://script.google.com/macros/s/AKfycbxPsH5p2FENEF-7zvy7CEDdZKUtSvuqQVBsdQ9kJhN1DM0BdbcjL7udv4jbdW_r8tZhCg/exec",
 
   // Ubicación aproximada (país/ciudad) vía ipapi.co. No se guarda la IP.
   geo: false,
@@ -74,6 +74,8 @@ window.HUB_CONFIG = {
   // Orígenes: dónde está impreso cada QR (?src=ID).
   //   id 🔒 fijo · label nombre · type formato · place ubicación · image vista previa en previews/
   sources: [
+    { id: "folleto", label: "Folleto de la licenciatura", type: "Folleto", place: "Folletos impresos de cada licenciatura (QR website y salidas de campo)", image: "previews/folleto-licenciatura.webp" },
+    { id: "folleto-general", label: "Folleto Licenciaturas (general)", type: "Folleto", place: "Folleto general A4 con las 9 licenciaturas", image: "previews/afiche-licenciaturas.webp" },
     { id: "afiche-biblioteca", label: "Afiche Licenciaturas", type: "Afiche", place: "Biblioteca General, piso 1", image: "previews/afiche-licenciaturas.webp" },
     { id: "volante-evento", label: "Volante bienvenida", type: "Volante", place: "Evento de bienvenida, Auditorio Lleras" },
     { id: "pantalla-lobby", label: "Pantalla lobby", type: "Pantalla", place: "Lobby edificio Facultad" },

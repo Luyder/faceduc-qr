@@ -10,9 +10,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/hub.css?v=20261021a">
-  <link rel="stylesheet" href="assets/salidas.css?v=20261021a">
-  <script src="config.js?v=20261021a"></script>
+  <link rel="stylesheet" href="assets/hub.css?v=20261029a">
+  <link rel="stylesheet" href="assets/salidas.css?v=20261029a">
+  <script src="config.js?v=20261029d"></script>
 </head>
 <body class="page-salidas">
   <div class="blob-wrap" aria-hidden="true">
@@ -74,8 +74,8 @@
     </footer>
   </main>
 
-  <script src="assets/nodes.js?v=20261021a"></script>
-  <script src="assets/tracker.js?v=20261021a"></script>
+  <script src="assets/nodes.js?v=20261029a"></script>
+  <script src="assets/tracker.js?v=20261029d"></script>
   <script>
     (function () {
       var C = window.HUB_CONFIG || {};
@@ -127,6 +127,9 @@
       });
       document.getElementById("help").hidden = !more.children.length;
 
+      ["back", "backBottom"].forEach(function (id) {
+        document.getElementById(id).addEventListener("click", function () { if (window.QRHub) QRHub.track("volver", id === "back" ? "arriba" : "abajo"); });
+      });
       if (window.QRHub) QRHub.start();
     })();
   </script>

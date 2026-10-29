@@ -52,10 +52,13 @@
   var rawSrc = norm(qs.get("src") || qs.get("qr") || qs.get("utm_source")).slice(0, 80);
   var knownSrc = resolve(CFG.sources, rawSrc);
   var src = knownSrc ? knownSrc.id : rawSrc;
+  // el origen del QR se recuerda durante toda la visita (pensum, salidas de campo…)
+  if (src && SS) SS.setItem("qrhub_src", src);
+  if (!src && SS) src = SS.getItem("qrhub_src") || "";
   if (!src) src = document.referrer ? "referido" : "directo";
   var target = qs.get("to") || qs.get("go") || "";
   // licenciatura (nodo): ?lic=ID, también por alias
-  var rawNode = norm(qs.get("lic") || qs.get("n")).slice(0, 60);
+  var rawNode = norm(qs.get("lic") || qs.get("n") || window.QRHUB_NODE).slice(0, 60);
   var program = window.QRNodes ? QRNodes.program(CFG, rawNode) : null;
   var node = program ? program.id : rawNode;
 
@@ -172,6 +175,14 @@
     return copy;
   }
 
+  // acción dentro del sitio: abrir/cerrar el visor, ver un curso, volver de otra pestaña…
+  function track(action, detail) {
+    var e = base("action");
+    e.action = String(action || "").slice(0, 40);
+    e.detail = String(detail == null ? "" : detail).slice(0, 120);
+    send(e);
+  }
+
   function trackClick(link) {
     clicks++;
     var ms = Math.round(performance.now() - t0);
@@ -185,8 +196,11 @@
     send(e);
   }
 
-  var exitSent = 0;
+  var exitSent = 0, lastExitAt = -1e9;
   function trackExit() {
+    if (window.QRHUB_NO_EXIT) return;   // páginas dentro del visor (pensum): la salida la mide la página principal
+    if (performance.now() - lastExitAt < 1500) return;   // pagehide + visibilitychange llegan juntos al navegar
+    lastExitAt = performance.now();
     var e = base("exit");
     e.dwell_ms = dwell();
     e.clicks = clicks;
@@ -196,19 +210,28 @@
     send(e);
   }
 
+  var hiddenAt = null;
   document.addEventListener("visibilitychange", function () {
     if (document.visibilityState === "hidden") {
       if (visibleSince != null) { visibleMs += performance.now() - visibleSince; visibleSince = null; }
+      hiddenAt = performance.now();
       trackExit();
     } else {
       visibleSince = performance.now();
+      // volvió al sitio después de abrir un enlace en otra pestaña (o de cambiar de app)
+      if (hiddenAt != null && !window.QRHUB_NO_EXIT) {
+        var away = Math.round((performance.now() - hiddenAt) / 1000);
+        if (away >= 2) track("regresa", away + (lastLink ? "|" + lastLink : ""));
+      }
+      hiddenAt = null;
     }
   });
-  window.addEventListener("pagehide", function () { if (!exitSent) trackExit(); });
+  window.addEventListener("pagehide", trackExit);
 
   // ---------- API pública ----------
   window.QRHub = {
     trackClick: trackClick,
+    track: track,
     findLink: findLink,
     program: program,
     // Registra la visita. Si hay ?to=ID válido, redirige directamente (modo acortador).

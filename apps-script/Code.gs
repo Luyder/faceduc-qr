@@ -1,6 +1,8 @@
 /* ============================================================
    Backend gratuito: Google Apps Script + Google Sheets
-   - doPost recibe eventos del nodo (visit / click / exit)
+   - doPost recibe eventos del nodo (visit / click / exit / action)
+     action = lo que la persona hace dentro del sitio: abrir el pensum,
+     ver un curso, abrir el recorrido 360, volver de otra pestaña…
    - doPost con {action:"read", key} devuelve los datos al panel
    La clave de lectura se guarda en Propiedades del script:
    Configuración del proyecto ▸ Propiedades del script ▸ ADMIN_KEY
@@ -11,9 +13,10 @@ var COLUMNS = [
   "server_ts", "ts", "type", "vid", "sid", "src", "utm_medium", "utm_campaign",
   "link_id", "link_url", "t_to_click_ms", "dwell_ms", "clicks", "new_visitor",
   "device", "os", "browser", "lang", "tz", "screen", "ref", "country", "city", "page",
-  "node"   // licenciatura (?lic=). Columnas nuevas siempre al final para no desordenar las anteriores
+  "node",   // licenciatura (?lic=). Columnas nuevas siempre al final para no desordenar las anteriores
+  "action", "detail"   // qué hizo dentro del sitio y sobre qué (curso, pestaña, segundos…)
 ];
-var TYPES = { visit: 1, click: 1, exit: 1 };
+var TYPES = { visit: 1, click: 1, exit: 1, action: 1 };
 
 function sheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
