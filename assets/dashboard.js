@@ -772,10 +772,11 @@
   function renderSankey(P) {
     var box = $("#sankey"); box.textContent = "";
     if (!P.length) { box.appendChild(el("p", "empty", "Sin datos en este periodo.")); return; }
-    var COLS = ["Origen del QR", "Licenciatura", "Paso 1", "Paso 2", "Paso 3", "Final"], MAXN = 6, END = "Se va";
+    var COLS = ["Origen del QR", "Licenciatura", "Paso 1", "Paso 2", "Paso 3", "Último paso"], MAXN = 6, END = "Se va";
     var rows = P.map(function (p) {
       var t = [srcLabel(p.src), p.node ? licLabel(p.node) : "Selector"].concat(p.steps.slice(0, 3));
-      t.push(p.steps.length > 3 ? "Sigue explorando" : (p.steps.length ? END : "Se va sin elegir"));
+      // más de 3 pasos: la última columna muestra dónde estaba justo antes de irse
+      t.push(p.steps.length > 3 ? p.steps[p.steps.length - 1] : (p.steps.length ? END : "Se va sin elegir"));
       return t;
     });
     // limita cada columna a sus MAXN puntos más grandes; el resto se agrupa en «Otros»
@@ -792,7 +793,7 @@
         if (c) { var lk = (c - 1) + "|" + r[c - 1] + ">" + id; (links[lk] = links[lk] || { s: (c - 1) + "|" + r[c - 1], t: id, rows: [] }).rows.push(i); }
       });
     });
-    var isEnd = function (nm) { return /^Se va|^Sigue/.test(nm); };
+    var isEnd = function (nm) { return /^Se va/.test(nm); };
     var cols = COLS.map(function (_, c) {
       return Object.keys(nodes).map(function (k) { return nodes[k]; }).filter(function (n) { return n.c === c; })
         .sort(function (a, b) { return (isEnd(a.name) - isEnd(b.name)) || (a.name === "Otros") - (b.name === "Otros") || b.rows.length - a.rows.length; });
@@ -848,7 +849,7 @@
         var name = n.name.length > 22 ? n.name.slice(0, 21) + "…" : n.name;
         tx.appendChild(document.createTextNode(name + " "));
         var v = sv("tspan", { "class": "sk-n" }, tx); v.textContent = fmtInt(n.rows.length);
-        bindTip(g, n.name, fmtInt(n.rows.length) + " visitas · " + fmtPct(n.rows.length / P.length) + " del total");
+        bindTip(g, n.name, fmtInt(n.rows.length) + " visitas · " + fmtPct(n.rows.length / P.length) + " del total" + (n.c === 5 ? " · su último paso antes de irse" : ""));
         g.addEventListener("pointerenter", function () { if (!selected) highlight(n); });
         g.addEventListener("pointerleave", function () { if (!selected) highlight(null); });
         g.addEventListener("click", function () { selected = selected === n ? null : n; highlight(selected || n); });
