@@ -719,7 +719,7 @@
     var by = {}, order = [];
     evts.forEach(function (e) { if (!by[e.sid]) { by[e.sid] = []; order.push(e.sid); } by[e.sid].push(e); });
     return order.map(function (sid) {
-      var ev = by[sid], node = "", steps = [], links = [], f = {}, lastExit = "";
+      var ev = by[sid], node = "", steps = [], stepT = [], links = [], f = {}, lastExit = "";
       ev.forEach(function (e) {
         if (e.node) node = e.node;
         // «Se va» solo si lo último que hizo fue cerrar la pestaña; cualquier actividad posterior lo anula
@@ -730,10 +730,18 @@
         if (e.action === "curso") f.curso = 1;
         if (e.type === "click" && HIGH_INTENT.indexOf(e.link) >= 0) f.intent = 1;
         var t = stepToken(e);
-        if (t && t !== steps[steps.length - 1]) steps.push(t);
+        if (t && t !== steps[steps.length - 1]) { steps.push(t); stepT.push(e.t.getTime()); }
       });
       f.closed = lastExit === "cierra";   // «Se va» solo si cerró la pestaña (no si cambió de pestaña)
-      return { src: ev[0].src, node: node, steps: steps, links: links, f: f, n: ev.length };
+      // tiempo en cada punto = hasta el siguiente paso (o hasta el último registro de la visita); < 1 s no se cuenta
+      var t0 = ev[0].t.getTime(), end = ev[ev.length - 1].t.getTime();
+      var dur = function (a, b) { var d = b - a; return d >= 1000 ? d : null; };
+      var times = {
+        total: dur(t0, end),
+        lic: dur(t0, stepT.length ? stepT[0] : end),
+        steps: stepT.map(function (st, i) { return dur(st, i + 1 < stepT.length ? stepT[i + 1] : end); })
+      };
+      return { src: ev[0].src, node: node, steps: steps, links: links, f: f, n: ev.length, times: times };
     });
   }
 
@@ -783,11 +791,14 @@
     var box = $("#sankey"); box.textContent = "";
     if (!P.length) { box.appendChild(el("p", "empty", "Sin datos en este periodo.")); return; }
     var COLS = ["Origen del QR", "Licenciatura", "Paso 1", "Paso 2", "Paso 3", "Último paso", "Cierra"], MAXN = 6, END = "Se va";
+    var rowT = [];   // tiempo en cada punto, en paralelo a cada fila
     var rows = P.map(function (p) {
       var t = [srcLabel(p.src), p.node ? licLabel(p.node) : "Selector"].concat(p.steps.slice(0, 3));
+      var tt = [p.times.total, p.times.lic].concat(p.times.steps.slice(0, 3));
       // más de 3 pasos: la última columna muestra dónde estaba justo antes de irse
-      if (p.steps.length > 3) t.push(p.steps[p.steps.length - 1]);
-      if (p.f.closed) t.push(p.steps.length ? END : "Se va sin elegir");
+      if (p.steps.length > 3) { t.push(p.steps[p.steps.length - 1]); tt.push(p.times.steps[p.steps.length - 1]); }
+      if (p.f.closed) { t.push(p.steps.length ? END : "Se va sin elegir"); tt.push(null); }
+      rowT.push(tt);
       return t;
     });
     // limita cada columna a sus MAXN puntos más grandes; el resto se agrupa en «Otros»
@@ -800,7 +811,9 @@
     rows.forEach(function (r, i) {
       r.forEach(function (name, c) {
         var id = c + "|" + name;
-        (nodes[id] = nodes[id] || { id: id, c: c, name: name, rows: [] }).rows.push(i);
+        var nd = nodes[id] = nodes[id] || { id: id, c: c, name: name, rows: [], ms: [] };
+        nd.rows.push(i);
+        if (rowT[i][c] != null) nd.ms.push(rowT[i][c]);
         if (c) { var lk = (c - 1) + "|" + r[c - 1] + ">" + id; (links[lk] = links[lk] || { s: (c - 1) + "|" + r[c - 1], t: id, rows: [] }).rows.push(i); }
       });
     });
@@ -859,7 +872,9 @@
         var name = n.name.length > 22 ? n.name.slice(0, 21) + "…" : n.name;
         tx.appendChild(document.createTextNode(name + " "));
         var v = sv("tspan", { "class": "sk-n" }, tx); v.textContent = fmtInt(n.rows.length);
-        bindTip(g, n.name, fmtInt(n.rows.length) + " visitas · " + fmtPct(n.rows.length / P.length) + " del total" + (n.c === 5 ? " · su último paso antes de irse" : ""));
+        var avg = n.ms.length ? n.ms.reduce(function (a, b) { return a + b; }, 0) / n.ms.length : null;
+        var when = avg == null ? "" : n.c === 0 ? " · la visita dura " + fmtDur(avg) + " en promedio" : " · pasan " + fmtDur(avg) + " en promedio aquí";
+        bindTip(g, n.name, fmtInt(n.rows.length) + " visitas · " + fmtPct(n.rows.length / P.length) + " del total" + when + (n.c === 5 && !isEnd(n.name) ? " · su último paso antes de irse" : ""));
         g.addEventListener("pointerenter", function () { if (!selected) highlight(n); });
         g.addEventListener("pointerleave", function () { if (!selected) highlight(null); });
         g.addEventListener("click", function () { selected = selected === n ? null : n; highlight(selected || n); });
