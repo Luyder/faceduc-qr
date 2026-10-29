@@ -126,7 +126,6 @@
     var t = location.hash.slice(1), btn = t && document.querySelector('.tab[data-tab="' + t + '"]');
     if (btn) btn.click();
   }, 0);
-  $("#hubName").textContent = C.title ? "Nodo: " + C.title : "";
 
   // ================================================================
   //   CARGA DE DATOS
@@ -155,9 +154,18 @@
 
   function setStatus(msg) { $("#status").textContent = msg; }
 
+  // Sesión fantasma: el navegador recargó una pestaña vieja del sitio; solo hay entrada y cierre en menos de 1,5 s.
+  function dropGhosts(evts) {
+    var by = {};
+    evts.forEach(function (e) { (by[e.sid] = by[e.sid] || []).push(e); });
+    return evts.filter(function (e) {
+      var s = by[e.sid];
+      return !(s.length === 2 && s[0].type === "visit" && s[1].type === "exit" && s[1].detail === "cierra" && s[1].t - s[0].t < 1500);
+    });
+  }
   function loaded(raw, mode, label) {
     var before = state.mode === mode ? state.events.length : null;
-    state.events = normalize(raw);
+    state.events = dropGhosts(normalize(raw));
     state.mode = mode;
     var fresh = before != null && state.events.length > before ? " · +" + (state.events.length - before) + " nuevos" : "";
     setStatus(label + " · " + fmtInt(state.events.length) + " eventos" + (liveTimer && mode !== "demo" ? " · en vivo, actualizado " + new Date().toLocaleTimeString("es-CO") + fresh : ""));
@@ -714,13 +722,12 @@
       var ev = by[sid], node = "", steps = [], links = [], f = {}, lastExit = "";
       ev.forEach(function (e) {
         if (e.node) node = e.node;
-        if (e.type === "exit") lastExit = e.detail;
-        else if (e.type === "visit") lastExit = "";   // siguió navegando dentro del sitio
+        // «Se va» solo si lo último que hizo fue cerrar la pestaña; cualquier actividad posterior lo anula
+        lastExit = e.type === "exit" ? e.detail : "";
         if (e.type === "click") links.push(e.link);
         if (e.type === "click" || e.type === "action") f.interact = 1;
         if (e.type === "click" && lookup(C.links, e.link) && lookup(C.links, e.link).type === "pensum") f.pensum = 1;
         if (e.action === "curso") f.curso = 1;
-        if (e.action === "regresa") f.back = 1;
         if (e.type === "click" && HIGH_INTENT.indexOf(e.link) >= 0) f.intent = 1;
         var t = stepToken(e);
         if (t && t !== steps[steps.length - 1]) steps.push(t);
@@ -739,7 +746,7 @@
     [["Destino más elegido", last.length ? last[0][0] : "—", last.length ? fmtPct(last[0][1] / n) + " de las visitas terminan ahí" : "aún sin clics"],
      ["Pasos por visita", steps.length ? String(steps[Math.floor(steps.length / 2)]) : "—", "mediana de acciones dentro del sitio"],
      ["Intención de ingresar", pct("intent"), "abren inscripción, asesoría o becas"],
-     ["Vuelven tras salir", pct("back"), "regresan al sitio después de abrir un enlace"]
+     ["Leen el pensum", pct("pensum"), "abren el pensum de la licenciatura"]
     ].forEach(function (it) {
       var k = el("div", "kpi");
       k.appendChild(el("div", "k-label", it[0]));
@@ -881,7 +888,6 @@
       case "curso": return "Lee la descripción del curso «" + d + "»";
       case "semestre": return "Cambia al semestre " + d + " del pensum";
       case "cierra-visor": return "Cierra el visor de «" + linkLabel(parts[0]) + "» tras " + fmtDur(Number(parts[1]) * 1000);
-      case "regresa": return "Vuelve al sitio tras " + fmtDur(Number(parts[0]) * 1000) + (parts[1] ? " fuera (estaba en «" + linkLabel(parts[1]) + "»)" : " fuera");
       case "elige-licenciatura": return "Elige " + licLabel(d) + " en el selector";
       case "volver": return "Pulsa «volver» (" + d + ")";
       default: return e.action + (d ? " · " + d : "");
@@ -891,11 +897,23 @@
   function renderJourneys(evts) {
     var box = $("#journeys"); box.textContent = "";
     var by = {}, order = [];
-    evts.forEach(function (e) { if (!by[e.sid]) { by[e.sid] = []; order.push(e.sid); } by[e.sid].push(e); });
+    evts.forEach(function (e) {
+      if (e.action === "regresa") return;   // «Vuelve al sitio» no se muestra
+      if (!by[e.sid]) { by[e.sid] = []; order.push(e.sid); } by[e.sid].push(e);
+    });
     var list = order.reverse().slice(0, 40);
     if (!list.length) { box.appendChild(el("p", "empty", "Aún no hay recorridos en este periodo.")); return; }
     list.forEach(function (sid, i) {
-      var steps = by[sid].filter(function (e, i, a) { var nx = a[i + 1]; return !(e.type === "exit" && e.detail === "oculta" && nx && nx.type === "exit" && nx.detail === "cierra" && nx.t - e.t < 2000); });
+      // oculta: la salida «oculta» pegada a un «cierra» y las recargas fantasma de pestañas viejas (entra y cierra en < 1,5 s)
+      var ghost = function (e, nx) { return e.type === "visit" && nx && nx.type === "exit" && nx.detail === "cierra" && nx.page === e.page && nx.t - e.t < 1500; };
+      var steps = by[sid].filter(function (e, i, a) {
+        var nx = a[i + 1], pv = a[i - 1];
+        if (e.type === "exit" && e.detail === "oculta" && nx && nx.type === "exit" && nx.detail === "cierra" && nx.t - e.t < 2000) return false;
+        if (ghost(e, nx)) return false;
+        if (pv && ghost(pv, e)) return false;
+        return true;
+      });
+      if (!steps.length) return;
       var f = steps[0], last = steps[steps.length - 1];
       var node = ""; steps.forEach(function (e) { if (e.node) node = e.node; });
       var det = el("details", "journey"); if (i === 0) det.open = true;
@@ -927,7 +945,7 @@
     var t = $("#recent"); t.textContent = "";
     headRow(t, [["Fecha"], ["Evento"], ["Licenciatura"], ["Entrada"], ["Enlace / acción"], ["Dispositivo"], ["Navegador"], ["Permanencia", 1], ["Sesión"]]);
     var tb = el("tbody");
-    evts.slice(-150).reverse().forEach(function (e) {
+    evts.filter(function (e) { return e.action !== "regresa"; }).slice(-150).reverse().forEach(function (e) {
       var tr = el("tr");
       cell(tr, e.t.toLocaleString("es-CO", { dateStyle: "short", timeStyle: "medium" }));
       var td = cell(tr, ""); td.appendChild(el("span", "pill", TYPE_LABEL[e.type] || e.type));

@@ -28,8 +28,6 @@
   var vid = LS && LS.getItem("qrhub_vid");
   if (!vid) { vid = rid(); newVisitor = true; if (LS) LS.setItem("qrhub_vid", vid); }
 
-  var sid = SS && SS.getItem("qrhub_sid");
-  if (!sid) { sid = rid(); if (SS) SS.setItem("qrhub_sid", sid); }
 
   // ---------- ids fijos + alias ----------
   // Un QR impreso solo contiene ids. Se buscan por id o por cualquiera de sus "aliases",
@@ -52,9 +50,25 @@
   var rawSrc = norm(qs.get("src") || qs.get("qr") || qs.get("utm_source")).slice(0, 80);
   var knownSrc = resolve(CFG.sources, rawSrc);
   var src = knownSrc ? knownSrc.id : rawSrc;
+
+  // ---------- sesión (visita) compartida por todas las pestañas del dispositivo ----------
+  // Antes era por pestaña: si el navegador recargaba una pestaña vieja del sitio contaba como otra visita.
+  // Termina tras 30 min sin actividad o cuando se escanea un QR distinto.
+  var SESSION_MS = 30 * 60 * 1000, SKEY = "qrhub_sess", ST = LS || SS;
+  function readSess() { try { return JSON.parse((ST && ST.getItem(SKEY)) || "null"); } catch (e) { return null; } }
+  function touchSess(s, force) {
+    s.t = Date.now();
+    var cur = readSess();
+    if (!force && cur && cur.id !== s.id && Date.now() - cur.t < SESSION_MS) return;   // otra pestaña ya empezó una visita nueva
+    try { if (ST) ST.setItem(SKEY, JSON.stringify(s)); } catch (e) {}
+  }
+  var sess = readSess();
+  if (!sess || Date.now() - sess.t > SESSION_MS || (src && src !== (sess.src || ""))) sess = { id: rid(), src: src };
+  if (src) sess.src = src;
+  touchSess(sess, true);
+  var sid = sess.id;
   // el origen del QR se recuerda durante toda la visita (pensum, salidas de campo…)
-  if (src && SS) SS.setItem("qrhub_src", src);
-  if (!src && SS) src = SS.getItem("qrhub_src") || "";
+  if (!src) src = sess.src || "";
   if (!src) src = document.referrer ? "referido" : "directo";
   var target = qs.get("to") || qs.get("go") || "";
   // licenciatura (nodo): ?lic=ID, también por alias
@@ -137,6 +151,11 @@
 
   function send(evt) {
     if (window.QRHUB_PREVIEW) return;   // vista previa del editor: no se registra nada
+    var cur = readSess();
+    if (cur && cur.id === sess.id) sess.t = Math.max(sess.t, cur.t);   // otra pestaña pudo mantener viva la visita
+    var renew = Date.now() - sess.t > SESSION_MS;
+    if (renew) { sess = { id: rid(), src: sess.src }; sid = evt.sid = sess.id; }   // pestaña inactiva más de 30 min
+    touchSess(sess, renew);
     if (!CFG.endpoint) {
       if (!LS) return;
       try {
