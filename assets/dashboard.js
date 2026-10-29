@@ -798,7 +798,7 @@
       return Object.keys(nodes).map(function (k) { return nodes[k]; }).filter(function (n) { return n.c === c; })
         .sort(function (a, b) { return (isEnd(a.name) - isEnd(b.name)) || (a.name === "Otros") - (b.name === "Otros") || b.rows.length - a.rows.length; });
     }).filter(function (col) { return col.length; });
-    var W = Math.max(940, box.clientWidth || 940), H = 440, NW = 12, PAD = 14, TOP = 26, LAB = 150;
+    var W = Math.max(940, box.clientWidth || 940), H = 440, NW = 12, PAD = 14, TOP = 26, LAB = 180;   // LAB: espacio a la derecha para las etiquetas de la última columna
     var maxCount = Math.max.apply(null, cols.map(function (col) { return col.reduce(function (a, n) { return a + n.rows.length; }, 0); }));
     var maxN = Math.max.apply(null, cols.map(function (col) { return col.length; }));
     var k = (H - TOP - PAD * (maxN - 1)) / maxCount;
@@ -809,7 +809,7 @@
     });
     var svg = sv("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img", "aria-label": "Mapa de recorridos de las visitas" }, box);
     cols.forEach(function (col, ci) {
-      var t = sv("text", { x: ci * dx + (ci === cols.length - 1 ? NW : 0), y: 12, "class": "sk-col", "text-anchor": ci === cols.length - 1 ? "end" : "start" }, svg);
+      var t = sv("text", { x: ci * dx, y: 12, "class": "sk-col" }, svg);
       t.textContent = COLS[col[0].c];
     });
     var gLinks = sv("g", {}, svg), gHi = sv("g", {}, svg), gNodes = sv("g", {}, svg);
@@ -844,8 +844,7 @@
         var r = sv("rect", { x: n.x, y: n.y, width: NW, height: n.h, rx: 3 }, g);
         var color = ci === 1 ? lic(n.name) : null;
         if (color) r.style.fill = color;
-        var last = ci === cols.length - 1;
-        var tx = sv("text", { x: last ? n.x - 6 : n.x + NW + 6, y: n.y + n.h / 2, "text-anchor": last ? "end" : "start", "dominant-baseline": "middle" }, g);
+        var tx = sv("text", { x: n.x + NW + 6, y: n.y + n.h / 2, "dominant-baseline": "middle" }, g);
         var name = n.name.length > 22 ? n.name.slice(0, 21) + "…" : n.name;
         tx.appendChild(document.createTextNode(name + " "));
         var v = sv("tspan", { "class": "sk-n" }, tx); v.textContent = fmtInt(n.rows.length);
