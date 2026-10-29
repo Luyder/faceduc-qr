@@ -156,9 +156,11 @@
   function setStatus(msg) { $("#status").textContent = msg; }
 
   function loaded(raw, mode, label) {
+    var before = state.mode === mode ? state.events.length : null;
     state.events = normalize(raw);
     state.mode = mode;
-    setStatus(label + " · " + fmtInt(state.events.length) + " eventos");
+    var fresh = before != null && state.events.length > before ? " · +" + (state.events.length - before) + " nuevos" : "";
+    setStatus(label + " · " + fmtInt(state.events.length) + " eventos" + (liveTimer && mode !== "demo" ? " · en vivo, actualizado " + new Date().toLocaleTimeString("es-CO") + fresh : ""));
     $("#dash").hidden = false;
     $("#dash").classList.remove("is-loading");
     fillFilters();
@@ -168,13 +170,15 @@
   var keyInput = $("#key");
   if (LS && LS.getItem("qrhub_key")) { keyInput.value = LS.getItem("qrhub_key"); $("#remember").checked = true; }
 
-  function loadRemote() {
+  function loadRemote(silent) {
+    silent = silent === true;
     if (!C.endpoint) { setStatus("Falta el endpoint en config.js. Mientras tanto usa «Datos de prueba» o «Ver demo»."); return; }
     var key = keyInput.value.trim();
+    if (!key && silent) return;
     if (!key) { setStatus("Escribe la clave de lectura."); keyInput.focus(); return; }
     if (LS) { if ($("#remember").checked) LS.setItem("qrhub_key", key); else LS.removeItem("qrhub_key"); }
-    setStatus("Descargando…");
-    $("#dash").classList.add("is-loading");
+    if (!silent) { setStatus("Descargando…"); $("#dash").classList.add("is-loading"); }
+    liveBusy = true;
     fetch(C.endpoint, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -185,10 +189,24 @@
     }).catch(function (err) {
       $("#dash").classList.remove("is-loading");
       setStatus("No se pudo cargar: " + err.message);
-    });
+    }).then(function () { liveBusy = false; });
   }
-  $("#loadRemote").addEventListener("click", loadRemote);
+  $("#loadRemote").addEventListener("click", function () { loadRemote(); });
   keyInput.addEventListener("keydown", function (e) { if (e.key === "Enter") loadRemote(); });
+  // En vivo: vuelve a descargar cada pocos segundos sin recargar la página (para demos)
+  var liveTimer = null, liveBusy = false, LIVE_MS = 5000;
+  function liveTick() {
+    if (document.hidden || liveBusy) return;
+    if (state.mode === "remote") loadRemote(true);
+    else if (state.mode === "local") $("#loadLocal").click();
+  }
+  $("#live").addEventListener("click", function () {
+    var on = !liveTimer;
+    if (on) { liveTimer = setInterval(liveTick, LIVE_MS); liveTick(); }
+    else { clearInterval(liveTimer); liveTimer = null; setStatus($("#status").textContent.replace(/ · en vivo.*$/, "")); }
+    this.classList.toggle("is-live", on);
+    this.setAttribute("aria-pressed", on);
+  });
   $("#refresh").addEventListener("click", function () {
     if (state.mode === "remote") loadRemote();
     else if (state.mode === "local") $("#loadLocal").click();

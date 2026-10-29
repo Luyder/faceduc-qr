@@ -486,3 +486,11 @@ table.data tr.clickable { cursor: pointer; }
 .sk-node text { fill: var(--ink); }
 .sk-node .sk-n { fill: var(--ink-3); font-variant-numeric: tabular-nums; }
 .sk-node text { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+
+/* ---------- en vivo ---------- */
+.live-btn { display: inline-flex; align-items: center; gap: 8px; }
+.live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); }
+.live-btn.is-live { border-color: var(--red); color: var(--red); }
+.live-btn.is-live .live-dot { background: var(--red); animation: livePulse 1.4s ease-in-out infinite; }
+@keyframes livePulse { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .live-btn.is-live .live-dot { animation: none; } }
