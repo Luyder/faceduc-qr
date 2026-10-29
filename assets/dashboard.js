@@ -194,7 +194,7 @@
   $("#loadRemote").addEventListener("click", function () { loadRemote(); });
   keyInput.addEventListener("keydown", function (e) { if (e.key === "Enter") loadRemote(); });
   // En vivo: vuelve a descargar cada pocos segundos sin recargar la página (para demos)
-  var liveTimer = null, liveBusy = false, LIVE_MS = 5000;
+  var liveTimer = null, liveBusy = false, LIVE_MS = 1000;
   function liveTick() {
     if (document.hidden || liveBusy) return;
     if (state.mode === "remote") loadRemote(true);
