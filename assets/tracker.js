@@ -196,12 +196,15 @@
     send(e);
   }
 
-  var exitSent = 0, lastExitAt = -1e9;
-  function trackExit() {
-    if (window.QRHUB_NO_EXIT) return;   // páginas dentro del visor (pensum): la salida la mide la página principal
-    if (performance.now() - lastExitAt < 1500) return;   // pagehide + visibilitychange llegan juntos al navegar
+  // kind: "oculta" = cambió de pestaña o de app (puede volver) · "cierra" = cerró la pestaña o salió de la página
+  var exitSent = 0, lastExitAt = -1e9, closed = false;
+  function trackExit(kind) {
+    if (window.QRHUB_NO_EXIT || closed) return;   // pensum en el visor: la salida la mide la página principal
+    if (kind === "cierra") closed = true;
+    else if (performance.now() - lastExitAt < 1500) return;   // pagehide + visibilitychange llegan juntos
     lastExitAt = performance.now();
     var e = base("exit");
+    e.detail = kind;
     e.dwell_ms = dwell();
     e.clicks = clicks;
     e.link_id = lastLink;               // vacío = abandono sin elegir enlace
@@ -215,7 +218,7 @@
     if (document.visibilityState === "hidden") {
       if (visibleSince != null) { visibleMs += performance.now() - visibleSince; visibleSince = null; }
       hiddenAt = performance.now();
-      trackExit();
+      trackExit("oculta");
     } else {
       visibleSince = performance.now();
       // volvió al sitio después de abrir un enlace en otra pestaña (o de cambiar de app)
@@ -226,7 +229,8 @@
       hiddenAt = null;
     }
   });
-  window.addEventListener("pagehide", trackExit);
+  window.addEventListener("pagehide", function () { trackExit("cierra"); });
+  window.addEventListener("pageshow", function (ev) { if (ev.persisted) closed = false; });   // volvió con «atrás» (caché del navegador)
 
   // ---------- API pública ----------
   window.QRHub = {

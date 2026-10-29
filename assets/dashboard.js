@@ -704,16 +704,18 @@
   function stepToken(e) {
     if (e.type === "click") return linkLabel(e.link);
     if (e.type !== "action") return "";
-    return ({ curso: "Explora cursos", semestre: "Explora cursos", regresa: "Vuelve al sitio", volver: "Vuelve al nodo" })[e.action] || "";
+    return ({ curso: "Explora cursos", semestre: "Explora cursos", volver: "Vuelve al nodo" })[e.action] || "";
   }
   // una fila por sesión: origen, licenciatura, pasos (sin repetir seguidos) y datos para el embudo
   function pathsOf(evts) {
     var by = {}, order = [];
     evts.forEach(function (e) { if (!by[e.sid]) { by[e.sid] = []; order.push(e.sid); } by[e.sid].push(e); });
     return order.map(function (sid) {
-      var ev = by[sid], node = "", steps = [], links = [], f = {};
+      var ev = by[sid], node = "", steps = [], links = [], f = {}, lastExit = "";
       ev.forEach(function (e) {
         if (e.node) node = e.node;
+        if (e.type === "exit") lastExit = e.detail;
+        else if (e.type === "visit") lastExit = "";   // siguió navegando dentro del sitio
         if (e.type === "click") links.push(e.link);
         if (e.type === "click" || e.type === "action") f.interact = 1;
         if (e.type === "click" && lookup(C.links, e.link) && lookup(C.links, e.link).type === "pensum") f.pensum = 1;
@@ -723,6 +725,7 @@
         var t = stepToken(e);
         if (t && t !== steps[steps.length - 1]) steps.push(t);
       });
+      f.closed = lastExit === "cierra";   // «Se va» solo si cerró la pestaña (no si cambió de pestaña)
       return { src: ev[0].src, node: node, steps: steps, links: links, f: f, n: ev.length };
     });
   }
@@ -772,18 +775,19 @@
   function renderSankey(P) {
     var box = $("#sankey"); box.textContent = "";
     if (!P.length) { box.appendChild(el("p", "empty", "Sin datos en este periodo.")); return; }
-    var COLS = ["Origen del QR", "Licenciatura", "Paso 1", "Paso 2", "Paso 3", "Último paso"], MAXN = 6, END = "Se va";
+    var COLS = ["Origen del QR", "Licenciatura", "Paso 1", "Paso 2", "Paso 3", "Último paso", "Cierra"], MAXN = 6, END = "Se va";
     var rows = P.map(function (p) {
       var t = [srcLabel(p.src), p.node ? licLabel(p.node) : "Selector"].concat(p.steps.slice(0, 3));
       // más de 3 pasos: la última columna muestra dónde estaba justo antes de irse
-      t.push(p.steps.length > 3 ? p.steps[p.steps.length - 1] : (p.steps.length ? END : "Se va sin elegir"));
+      if (p.steps.length > 3) t.push(p.steps[p.steps.length - 1]);
+      if (p.f.closed) t.push(p.steps.length ? END : "Se va sin elegir");
       return t;
     });
     // limita cada columna a sus MAXN puntos más grandes; el resto se agrupa en «Otros»
     for (var c = 0; c < COLS.length; c++) {
       var cnt = countBy(rows.filter(function (r) { return r.length > c; }), function (r) { return r[c]; });
       var keep = cnt.slice(0, MAXN).map(function (x) { return x[0]; });
-      rows.forEach(function (r) { if (r.length > c && keep.indexOf(r[c]) < 0) r[c] = "Otros"; });
+      rows.forEach(function (r) { if (r.length > c && keep.indexOf(r[c]) < 0 && !/^Se va/.test(r[c])) r[c] = "Otros"; });
     }
     var nodes = {}, links = {};
     rows.forEach(function (r, i) {
@@ -871,7 +875,7 @@
         : ({ "recorrido-360": "pestaña nueva", "sello-beca": "pestaña nueva" })[e.link] || "misma pestaña";
       return "Abre «" + linkLabel(e.link) + "» · " + where;
     }
-    if (e.type === "exit") return "Sale del sitio o cambia de pestaña" + (e.dwell != null ? " · " + fmtDur(e.dwell) + " de lectura" : "") + (e.link ? "" : " · sin elegir enlace");
+    if (e.type === "exit") return (e.detail === "cierra" ? "Cierra la pestaña o sale del sitio" : e.detail === "oculta" ? "Cambia de pestaña o de app" : "Sale del sitio o cambia de pestaña") + (e.dwell != null ? " · " + fmtDur(e.dwell) + " de lectura" : "") + (e.link ? "" : " · sin elegir enlace");
     var parts = d.split("|");
     switch (e.action) {
       case "curso": return "Lee la descripción del curso «" + d + "»";
@@ -891,7 +895,8 @@
     var list = order.reverse().slice(0, 40);
     if (!list.length) { box.appendChild(el("p", "empty", "Aún no hay recorridos en este periodo.")); return; }
     list.forEach(function (sid, i) {
-      var steps = by[sid], f = steps[0], last = steps[steps.length - 1];
+      var steps = by[sid].filter(function (e, i, a) { var nx = a[i + 1]; return !(e.type === "exit" && e.detail === "oculta" && nx && nx.type === "exit" && nx.detail === "cierra" && nx.t - e.t < 2000); });
+      var f = steps[0], last = steps[steps.length - 1];
       var node = ""; steps.forEach(function (e) { if (e.node) node = e.node; });
       var det = el("details", "journey"); if (i === 0) det.open = true;
       var sum = el("summary");
@@ -1002,10 +1007,10 @@
           act("regresa", Math.round(away / 1000) + "|" + link, away);
           dwell = at + Math.round(3000 + rnd() * 20000);
         }
-        out.push(Object.assign({ type: "exit", ts: new Date(t.getTime() + dwell).toISOString(), link_id: link, dwell_ms: dwell, clicks: 1, t_to_click_ms: ttc }, common));
+        out.push(Object.assign({ type: "exit", ts: new Date(t.getTime() + dwell).toISOString(), link_id: link, dwell_ms: dwell, clicks: 1, t_to_click_ms: ttc, detail: rnd() < .55 ? "cierra" : "oculta" }, common));
       } else {
         dwell = Math.round(1500 + Math.pow(rnd(), 2.2) * 120000);
-        out.push(Object.assign({ type: "exit", ts: new Date(t.getTime() + dwell).toISOString(), link_id: "", dwell_ms: dwell, clicks: 0 }, common));
+        out.push(Object.assign({ type: "exit", ts: new Date(t.getTime() + dwell).toISOString(), link_id: "", dwell_ms: dwell, clicks: 0, detail: rnd() < .8 ? "cierra" : "oculta" }, common));
       }
     }
     return out;
