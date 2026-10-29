@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="assets/dashboard.css?v=20261029b">
+  <link rel="stylesheet" href="assets/dashboard.css?v=20261029e">
   <script src="config.js?v=20261029d"></script>
   <script src="assets/nodes.js?v=20261029a"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -77,13 +77,27 @@
         </section>
 
         <section class="block">
-          <header class="sec"><span class="num">02</span><h2>Licenciaturas</h2>
+          <header class="sec"><span class="num">02</span><h2>¿A dónde van?</h2>
+            <p class="sec-hint">Qué hace la gente después de escanear. Pasa el mouse sobre cualquier barra o punto para ver el detalle.</p></header>
+          <div class="kpis" id="whereKpis"></div>
+          <div class="grid where-grid">
+            <article class="card"><h3>¿Qué tanto se involucran?</h3><div class="funnel" id="funnel"></div></article>
+            <article class="card"><h3>Dónde terminan (último enlace abierto)</h3><div class="bars" id="lastDest"></div></article>
+          </div>
+          <article class="card sk-card"><h3>Mapa del recorrido</h3>
+            <p class="sk-hint">Cada banda es un grupo de personas: su grosor indica cuántas siguieron ese camino. Toca un punto para fijar su recorrido.</p>
+            <div class="table-wrap"><div id="sankey" class="sankey"></div></div>
+          </article>
+        </section>
+
+        <section class="block">
+          <header class="sec"><span class="num">03</span><h2>Licenciaturas</h2>
             <p class="sec-hint">Cada licenciatura es un nodo propio. Toca una fila para filtrar todo el panel.</p></header>
           <div class="card flush"><div class="table-wrap"><table class="data" id="licTable"></table></div></div>
         </section>
 
         <section class="block">
-          <header class="sec"><span class="num">03</span><h2>Orígenes del QR</h2>
+          <header class="sec"><span class="num">04</span><h2>Orígenes del QR</h2>
             <p class="sec-hint">Cada pieza impresa o digital. Toca una para ver su vista previa y su detalle.</p></header>
           <div class="origins" id="origins"></div>
           <details class="more">
@@ -93,7 +107,7 @@
         </section>
 
         <section class="block">
-          <header class="sec"><span class="num">04</span><h2>Tendencia diaria</h2></header>
+          <header class="sec"><span class="num">05</span><h2>Tendencia diaria</h2></header>
           <div class="card">
             <div class="legend" id="lineLegend"></div>
             <div class="chart-box"><canvas id="lineChart" aria-label="Sesiones y clics por día" role="img"></canvas></div>
@@ -101,25 +115,25 @@
         </section>
 
         <section class="block">
-          <header class="sec"><span class="num">05</span><h2>Salidas por enlace</h2>
+          <header class="sec"><span class="num">06</span><h2>Salidas por enlace</h2>
             <p class="sec-hint">A dónde se van las personas y cuánto tardan en decidir.</p></header>
           <div class="card flush"><div class="table-wrap"><table class="data" id="linkTable"></table></div></div>
         </section>
 
         <section class="block">
-          <header class="sec"><span class="num">06</span><h2>Flujo: origen → salida</h2>
+          <header class="sec"><span class="num">07</span><h2>Flujo: origen → salida</h2>
             <p class="sec-hint">% de sesiones de cada origen que terminan en cada enlace. La última columna son abandonos.</p></header>
           <div class="card"><div class="table-wrap"><table class="heat" id="flow"></table></div></div>
         </section>
 
         <section class="block">
-          <header class="sec"><span class="num">07</span><h2>¿Cuándo escanean?</h2>
+          <header class="sec"><span class="num">08</span><h2>¿Cuándo escanean?</h2>
             <p class="sec-hint">Sesiones por día y hora (hora local de este navegador).</p></header>
           <div class="card"><div class="table-wrap"><table class="heat hours" id="hours"></table></div></div>
         </section>
 
         <section class="block">
-          <header class="sec"><span class="num">08</span><h2>Audiencia</h2></header>
+          <header class="sec"><span class="num">09</span><h2>Audiencia</h2></header>
           <div class="grid">
             <article class="card"><h3>Tiempo en la página</h3><div class="bars" id="dwell"></div></article>
             <article class="card"><h3>Dispositivo</h3><div class="bars" id="device"></div></article>
@@ -131,7 +145,7 @@
         </section>
 
         <section class="block">
-          <header class="sec"><span class="num">09</span><h2>Recorridos</h2>
+          <header class="sec"><span class="num">10</span><h2>Recorridos</h2>
             <p class="sec-hint">Paso a paso de cada visita: qué abre, qué cursos lee, cuánto tarda y cuándo vuelve de otra pestaña. Últimas 40 sesiones.</p></header>
           <div class="grid">
             <article class="card wide"><div id="journeys" class="journeys"></div></article>
@@ -140,7 +154,7 @@
         </section>
 
         <section class="block">
-          <header class="sec"><span class="num">10</span><h2>Últimos eventos</h2></header>
+          <header class="sec"><span class="num">11</span><h2>Últimos eventos</h2></header>
           <div class="card flush"><div class="table-wrap tall"><table class="data compact" id="recent"></table></div></div>
         </section>
       </div>
@@ -297,7 +311,7 @@
   </dialog>
 
   <div class="tip" id="tip" role="tooltip" hidden></div>
-  <script src="assets/dashboard.js?v=20261029c"></script>
+  <script src="assets/dashboard.js?v=20261029e"></script>
   <script src="assets/editor.js?v=20261029a"></script>
 </body>
 </html>

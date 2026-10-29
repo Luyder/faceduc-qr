@@ -278,6 +278,10 @@
     var S = sessionsOf(evts);
     var clicks = evts.filter(function (e) { return e.type === "click"; });
     renderKPIs(evts, S, clicks);
+    var P = pathsOf(evts);
+    renderWhere(P);
+    renderFunnel(P);
+    renderSankey(P);
     renderLine(evts, S, clicks);
     renderPrograms(S);
     renderOrigins(S);
@@ -674,6 +678,163 @@
       row.appendChild(el("span", "b-pct", fmtPct(r[1] / total)));
       bindTip(row, fmtInt(r[1]) + " sesiones", r[0] + " · " + fmtPct(r[1] / total));
       box.appendChild(row);
+    });
+  }
+
+  // ---------------- ¿a dónde van? ----------------
+  var HIGH_INTENT = ["inscripcion", "asesoria", "contacto", "becas"];   // enlaces que indican intención de ingresar
+  function stepToken(e) {
+    if (e.type === "click") return linkLabel(e.link);
+    if (e.type !== "action") return "";
+    return ({ curso: "Explora cursos", semestre: "Explora cursos", regresa: "Vuelve al sitio", volver: "Vuelve al nodo" })[e.action] || "";
+  }
+  // una fila por sesión: origen, licenciatura, pasos (sin repetir seguidos) y datos para el embudo
+  function pathsOf(evts) {
+    var by = {}, order = [];
+    evts.forEach(function (e) { if (!by[e.sid]) { by[e.sid] = []; order.push(e.sid); } by[e.sid].push(e); });
+    return order.map(function (sid) {
+      var ev = by[sid], node = "", steps = [], links = [], f = {};
+      ev.forEach(function (e) {
+        if (e.node) node = e.node;
+        if (e.type === "click") links.push(e.link);
+        if (e.type === "click" || e.type === "action") f.interact = 1;
+        if (e.type === "click" && lookup(C.links, e.link) && lookup(C.links, e.link).type === "pensum") f.pensum = 1;
+        if (e.action === "curso") f.curso = 1;
+        if (e.action === "regresa") f.back = 1;
+        if (e.type === "click" && HIGH_INTENT.indexOf(e.link) >= 0) f.intent = 1;
+        var t = stepToken(e);
+        if (t && t !== steps[steps.length - 1]) steps.push(t);
+      });
+      return { src: ev[0].src, node: node, steps: steps, links: links, f: f, n: ev.length };
+    });
+  }
+
+  function renderWhere(P) {
+    var box = $("#whereKpis"); box.textContent = "";
+    var n = P.length || 0;
+    var last = countBy(P.filter(function (p) { return p.links.length; }), function (p) { return linkLabel(p.links[p.links.length - 1]); });
+    var steps = P.map(function (p) { return p.steps.length; }).sort(function (a, b) { return a - b; });
+    var pct = function (k) { return fmtPct(n ? P.filter(function (p) { return p.f[k]; }).length / n : NaN); };
+    [["Destino más elegido", last.length ? last[0][0] : "—", last.length ? fmtPct(last[0][1] / n) + " de las visitas terminan ahí" : "aún sin clics"],
+     ["Pasos por visita", steps.length ? String(steps[Math.floor(steps.length / 2)]) : "—", "mediana de acciones dentro del sitio"],
+     ["Intención de ingresar", pct("intent"), "abren inscripción, asesoría o becas"],
+     ["Vuelven tras salir", pct("back"), "regresan al sitio después de abrir un enlace"]
+    ].forEach(function (it) {
+      var k = el("div", "kpi");
+      k.appendChild(el("div", "k-label", it[0]));
+      k.appendChild(el("div", "k-value" + (it[1].length > 8 ? " is-text" : ""), it[1]));
+      k.appendChild(el("div", "k-sub", it[2]));
+      box.appendChild(k);
+    });
+    barList($("#lastDest"), last, n);
+  }
+
+  function renderFunnel(P) {
+    var box = $("#funnel"); box.textContent = "";
+    var n = P.length;
+    if (!n) { box.appendChild(el("p", "empty", "Sin datos en este periodo.")); return; }
+    var c = function (k) { return P.filter(function (p) { return p.f[k]; }).length; };
+    var rows = [["Llegan al sitio", n], ["Hacen algo en el sitio", c("interact")], ["Abren el pensum", c("pensum")], ["Leen un curso", c("curso")], ["Van a inscripción, asesoría o becas", c("intent")]];
+    rows.forEach(function (r) {
+      var row = el("div", "f-row");
+      row.appendChild(el("div", "f-label", r[0]));
+      var track = el("div", "f-track"), fill = el("div", "f-fill");
+      fill.style.width = Math.max(0.5, 100 * r[1] / n) + "%"; track.appendChild(fill); row.appendChild(track);
+      row.appendChild(el("span", "f-val", fmtInt(r[1])));
+      row.appendChild(el("span", "f-pct", fmtPct(r[1] / n)));
+      bindTip(row, fmtInt(r[1]) + " visitas", fmtPct(r[1] / n) + " de todas las visitas");
+      box.appendChild(row);
+    });
+  }
+
+  // Mapa del recorrido: columnas Origen → Licenciatura → Paso 1-3; las bandas grises muestran cuántas personas
+  // pasan de un punto al siguiente. «Se va» = la visita termina ahí. Pasa el mouse o toca un punto para resaltar su camino.
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function sv(tag, attrs, parent) { var n = document.createElementNS(SVGNS, tag); for (var k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
+  function renderSankey(P) {
+    var box = $("#sankey"); box.textContent = "";
+    if (!P.length) { box.appendChild(el("p", "empty", "Sin datos en este periodo.")); return; }
+    var COLS = ["Origen del QR", "Licenciatura", "Paso 1", "Paso 2", "Paso 3", "Final"], MAXN = 6, END = "Se va";
+    var rows = P.map(function (p) {
+      var t = [srcLabel(p.src), p.node ? licLabel(p.node) : "Selector"].concat(p.steps.slice(0, 3));
+      t.push(p.steps.length > 3 ? "Sigue explorando" : (p.steps.length ? END : "Se va sin elegir"));
+      return t;
+    });
+    // limita cada columna a sus MAXN puntos más grandes; el resto se agrupa en «Otros»
+    for (var c = 0; c < COLS.length; c++) {
+      var cnt = countBy(rows.filter(function (r) { return r.length > c; }), function (r) { return r[c]; });
+      var keep = cnt.slice(0, MAXN).map(function (x) { return x[0]; });
+      rows.forEach(function (r) { if (r.length > c && keep.indexOf(r[c]) < 0) r[c] = "Otros"; });
+    }
+    var nodes = {}, links = {};
+    rows.forEach(function (r, i) {
+      r.forEach(function (name, c) {
+        var id = c + "|" + name;
+        (nodes[id] = nodes[id] || { id: id, c: c, name: name, rows: [] }).rows.push(i);
+        if (c) { var lk = (c - 1) + "|" + r[c - 1] + ">" + id; (links[lk] = links[lk] || { s: (c - 1) + "|" + r[c - 1], t: id, rows: [] }).rows.push(i); }
+      });
+    });
+    var isEnd = function (nm) { return /^Se va|^Sigue/.test(nm); };
+    var cols = COLS.map(function (_, c) {
+      return Object.keys(nodes).map(function (k) { return nodes[k]; }).filter(function (n) { return n.c === c; })
+        .sort(function (a, b) { return (isEnd(a.name) - isEnd(b.name)) || (a.name === "Otros") - (b.name === "Otros") || b.rows.length - a.rows.length; });
+    }).filter(function (col) { return col.length; });
+    var W = Math.max(940, box.clientWidth || 940), H = 440, NW = 12, PAD = 14, TOP = 26, LAB = 150;
+    var maxCount = Math.max.apply(null, cols.map(function (col) { return col.reduce(function (a, n) { return a + n.rows.length; }, 0); }));
+    var maxN = Math.max.apply(null, cols.map(function (col) { return col.length; }));
+    var k = (H - TOP - PAD * (maxN - 1)) / maxCount;
+    var dx = (W - LAB - NW) / Math.max(1, cols.length - 1);
+    cols.forEach(function (col, ci) {
+      var y = TOP;
+      col.forEach(function (n) { n.x = ci * dx; n.y = y; n.h = Math.max(2, n.rows.length * k); n.ci = ci; n.out = 0; n.inn = 0; y += n.h + PAD; });
+    });
+    var svg = sv("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img", "aria-label": "Mapa de recorridos de las visitas" }, box);
+    cols.forEach(function (col, ci) {
+      var t = sv("text", { x: ci * dx + (ci === cols.length - 1 ? NW : 0), y: 12, "class": "sk-col", "text-anchor": ci === cols.length - 1 ? "end" : "start" }, svg);
+      t.textContent = COLS[col[0].c];
+    });
+    var gLinks = sv("g", {}, svg), gHi = sv("g", {}, svg), gNodes = sv("g", {}, svg);
+    var L = Object.keys(links).map(function (k2) { return links[k2]; }).sort(function (a, b) { return nodes[a.t].y - nodes[b.t].y; });
+    function band(sx, sy, tx, ty, h) {
+      var mx = (sx + tx) / 2;
+      return "M" + sx + "," + sy + "C" + mx + "," + sy + " " + mx + "," + ty + " " + tx + "," + ty + "L" + tx + "," + (ty + h) + "C" + mx + "," + (ty + h) + " " + mx + "," + (sy + h) + " " + sx + "," + (sy + h) + "Z";
+    }
+    L.forEach(function (l) {
+      var a = nodes[l.s], b = nodes[l.t], h = l.rows.length * k;
+      l.sy = a.y + a.out; l.ty = b.y + b.inn; a.out += h; b.inn += h;
+      var p = sv("path", { d: band(a.x + NW, l.sy, b.x, l.ty, Math.max(1, h)), "class": "sk-link" }, gLinks);
+      bindTip(p, fmtInt(l.rows.length) + " visitas", a.name + " → " + b.name + " · " + fmtPct(l.rows.length / a.rows.length) + " de " + a.name);
+    });
+    var lic = function (name) { var pr = (C.programs || []).filter(function (q) { return q.name === name; })[0]; return pr && pr.color; };
+    var selected = null;
+    function highlight(n) {
+      gHi.textContent = "";
+      svg.classList.toggle("is-focus", !!n);
+      if (!n) return;
+      var set = {}; n.rows.forEach(function (r) { set[r] = 1; });
+      L.forEach(function (l) {
+        var m = l.rows.filter(function (r) { return set[r]; }).length;
+        if (!m) return;
+        var a = nodes[l.s], b = nodes[l.t];
+        sv("path", { d: band(a.x + NW, l.sy, b.x, l.ty, Math.max(1, m * k)), "class": "sk-hi" }, gHi);
+      });
+    }
+    cols.forEach(function (col, ci) {
+      col.forEach(function (n) {
+        var g = sv("g", { "class": "sk-node" + (isEnd(n.name) ? " is-end" : "") }, gNodes);
+        var r = sv("rect", { x: n.x, y: n.y, width: NW, height: n.h, rx: 3 }, g);
+        var color = ci === 1 ? lic(n.name) : null;
+        if (color) r.style.fill = color;
+        var last = ci === cols.length - 1;
+        var tx = sv("text", { x: last ? n.x - 6 : n.x + NW + 6, y: n.y + n.h / 2, "text-anchor": last ? "end" : "start", "dominant-baseline": "middle" }, g);
+        var name = n.name.length > 22 ? n.name.slice(0, 21) + "…" : n.name;
+        tx.appendChild(document.createTextNode(name + " "));
+        var v = sv("tspan", { "class": "sk-n" }, tx); v.textContent = fmtInt(n.rows.length);
+        bindTip(g, n.name, fmtInt(n.rows.length) + " visitas · " + fmtPct(n.rows.length / P.length) + " del total");
+        g.addEventListener("pointerenter", function () { if (!selected) highlight(n); });
+        g.addEventListener("pointerleave", function () { if (!selected) highlight(null); });
+        g.addEventListener("click", function () { selected = selected === n ? null : n; highlight(selected || n); });
+      });
     });
   }
 

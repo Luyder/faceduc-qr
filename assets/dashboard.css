@@ -459,3 +459,30 @@ table.data tr.clickable { cursor: pointer; }
 .j-t { color: var(--ink-3); font-variant-numeric: tabular-nums; min-width: 42px; }
 .j-click .j-l { font-weight: 600; }
 .j-exit .j-l { color: var(--ink-3); }
+
+/* ---------- ¿a dónde van? ---------- */
+#whereKpis { margin-bottom: 16px; }
+@media (min-width: 1000px) { #whereKpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.kpi .k-value.is-text { font-size: 24px; line-height: 1.3; padding-top: 8px; }
+.where-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 16px; }
+@media (max-width: 760px) { .where-grid { grid-template-columns: minmax(0, 1fr); } }
+.funnel { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.f-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "l v p" "t t t"; gap: 4px 10px; align-items: baseline; outline: none; }
+.f-label { grid-area: l; font-size: 13px; }
+.f-val { grid-area: v; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.f-pct { grid-area: p; font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; min-width: 40px; text-align: right; }
+.f-track { grid-area: t; height: 10px; background: var(--track); border-radius: 4px; overflow: hidden; }
+.f-fill { height: 100%; background: var(--series-1); border-radius: 4px; }
+.sk-card .sk-hint { font-size: 12.5px; color: var(--ink-3); margin: 4px 0 8px; }
+.sankey svg { display: block; font: 12px var(--sans); }
+.sk-col { fill: var(--ink-3); font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.sk-link { fill: var(--ink-3); opacity: .16; transition: opacity .15s; }
+.sk-link:hover { opacity: .32; }
+.is-focus .sk-link { opacity: .07; }
+.sk-hi { fill: var(--series-1); opacity: .45; pointer-events: none; }
+.sk-node { cursor: pointer; outline: none; }
+.sk-node rect { fill: var(--series-1); }
+.sk-node.is-end rect { fill: var(--ink-3); }
+.sk-node text { fill: var(--ink); }
+.sk-node .sk-n { fill: var(--ink-3); font-variant-numeric: tabular-nums; }
+.sk-node text { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
