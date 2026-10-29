@@ -75,10 +75,6 @@ window.HUB_CONFIG = {
   //   id 🔒 fijo · label nombre · type formato · place ubicación · image vista previa en previews/
   sources: [
     { id: "folleto", label: "Folleto de la licenciatura", type: "Folleto", place: "Folletos impresos de cada licenciatura (QR website y salidas de campo)", image: "previews/folleto-licenciatura.webp" },
-    { id: "folleto-general", label: "Folleto Licenciaturas (general)", type: "Folleto", place: "Folleto general A4 con las 9 licenciaturas", image: "previews/afiche-licenciaturas.webp" },
-    { id: "afiche-biblioteca", label: "Afiche Licenciaturas", type: "Afiche", place: "Biblioteca General, piso 1", image: "previews/afiche-licenciaturas.webp" },
-    { id: "volante-evento", label: "Volante bienvenida", type: "Volante", place: "Evento de bienvenida, Auditorio Lleras" },
-    { id: "pantalla-lobby", label: "Pantalla lobby", type: "Pantalla", place: "Lobby edificio Facultad" },
-    { id: "correo", label: "Correo masivo", type: "Correo", place: "Boletín a aspirantes" }
+    { id: "folleto-general", label: "Folleto Licenciaturas (general)", type: "Folleto", place: "Folleto general A4 con las 9 licenciaturas", image: "folletos/general-b-mini.webp" }
   ]
 };

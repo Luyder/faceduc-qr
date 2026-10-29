@@ -8,11 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="assets/dashboard.css?v=20261029f">
-  <script src="config.js?v=20261029d"></script>
+  <link rel="stylesheet" href="assets/dashboard.css?v=20261029q">
+  <script src="config.js?v=20261029q"></script>
   <script src="assets/nodes.js?v=20261029a"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <header class="masthead">
@@ -163,7 +164,24 @@
     <!-- ================= GENERADOR QR ================= -->
     <section id="tab-qr" hidden>
       <section class="block">
-        <header class="sec"><span class="num">01</span><h2>Crear un QR rastreable</h2></header>
+        <header class="sec"><span class="num">01</span><h2>Nuevo evento de folleto</h2>
+          <p class="sec-hint">Escribe el nombre del evento: se generan los 10 folletos (9 licenciaturas y el general) con el QR de ese evento, listos para imprimir.</p></header>
+        <div class="card ev-card">
+          <div class="ev-form">
+            <label class="field"><span>Nombre del evento</span><input id="evName" placeholder="ej. Uniandes Fest 2026-1" autocomplete="off"></label>
+            <p class="hint">ID que llevan los QR: <code id="evId">—</code></p>
+            <div class="ev-actions">
+              <button class="btn primary" id="evAll" disabled>Descargar los 10 folletos (PDF)</button>
+              <button class="btn" id="evSave" disabled>Registrar en el panel</button>
+            </div>
+            <p class="hint" id="evStatus">Los QR funcionan desde ya; registrarlo hace que el panel muestre el nombre del evento.</p>
+          </div>
+          <div class="ev-grid" id="evGrid"></div>
+        </div>
+      </section>
+
+      <section class="block">
+        <header class="sec"><span class="num">02</span><h2>Crear un QR rastreable</h2></header>
         <div class="card qr-layout">
           <div class="qr-form">
             <label class="field"><span>URL pública del nodo</span>
@@ -202,14 +220,14 @@
       </section>
 
       <section class="block">
-        <header class="sec"><span class="num">02</span><h2>¿Los QR están a salvo?</h2>
+        <header class="sec"><span class="num">03</span><h2>¿Los QR están a salvo?</h2>
           <p class="sec-hint">Revisión automática de <code>config.js</code>: detecta cambios que podrían romper un QR ya impreso.</p></header>
         <div class="card"><ul class="health" id="health"></ul></div>
       </section>
 
       <section class="block">
-        <header class="sec"><span class="num">03</span><h2>Todos los orígenes</h2>
-          <p class="sec-hint">Un QR por cada origen de <code>config.js</code>, apuntando al nodo divisor.</p></header>
+        <header class="sec"><span class="num">04</span><h2>Todos los orígenes</h2>
+          <p class="sec-hint">Un QR por cada origen de <code>config.js</code>. Los folletos traen el folleto de la licenciatura elegida con su QR ya puesto.</p></header>
         <div class="filters qr-all-filter"><label class="field"><span>Licenciatura</span><select id="qAllLic"></select></label></div>
         <div class="qr-grid" id="qrAll"></div>
       </section>
@@ -311,7 +329,7 @@
   </dialog>
 
   <div class="tip" id="tip" role="tooltip" hidden></div>
-  <script src="assets/dashboard.js?v=20261029p"></script>
-  <script src="assets/editor.js?v=20261029a"></script>
+  <script src="assets/dashboard.js?v=20261029t"></script>
+  <script src="assets/editor.js?v=20261029t"></script>
 </body>
 </html>

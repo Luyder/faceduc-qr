@@ -672,6 +672,7 @@
     pending = {};
     renderAll();
     if (window.QRPanel && window.QRPanel.refreshHealth) window.QRPanel.refreshHealth();
+    if (window.QRPanel && window.QRPanel.refreshSources) window.QRPanel.refreshSources();
     toast(msg, "good");
   }
 
@@ -778,6 +779,15 @@
       detectLocal();
       renderAll();
     },
-    isDirty: function () { return built && isDirty(); }
+    isDirty: function () { return built && isDirty(); },
+    // agrega un origen (p. ej. un evento de folleto) y guarda con el modo disponible: local, GitHub o descarga
+    addSource: function (s) {
+      this.open();
+      var taken = all(draft).some(function (x) { return norm(x.id) === norm(s.id) || (x.aliases || []).some(function (a) { return norm(a) === norm(s.id); }); });
+      if (taken) return "existe";
+      if (checks().some(function (r) { return r[0] === "bad"; })) return "bad";
+      draft.sources.push(s); changed(true); save();
+      return saveMode();
+    }
   };
 })();

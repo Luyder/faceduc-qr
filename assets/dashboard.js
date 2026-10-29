@@ -1121,7 +1121,8 @@
   }
   renderHealth();
   // lo usa el editor de configuración (editor.js)
-  window.QRPanel = { checkConfig: checkConfig, buildUrl: buildUrl, defaultBase: defaultBase, drawQR: drawQR, refreshHealth: renderHealth };
+  window.QRPanel = { checkConfig: checkConfig, buildUrl: buildUrl, defaultBase: defaultBase, drawQR: drawQR, refreshHealth: renderHealth,
+    refreshSources: function () { if (window.__qrRebuild) window.__qrRebuild(); } };
 
   // ================================================================
   //   GENERADOR DE QR
@@ -1162,6 +1163,54 @@
     a.href = c.toDataURL("image/png");
     a.download = filename + ".png";
     a.click();
+  }
+
+  // ---------------- folletos impresos con su QR ----------------
+  // Caras A y B de cada folleto (PDF de la Facultad) en folletos/<licenciatura|general>-a.jpg / -b.jpg.
+  // El QR «website» de la cara B está en el mismo lugar en todos (px de la imagen): se tapa y se pinta el nuevo.
+  var BROCHURE = { dir: "folletos/", qr: [194, 1985, 176], paper: "#f7f7ed", ink: "#151412", page: [595, 914] };
+  function isBrochure(s) { return !!s && /folleto/i.test(s.type || ""); }
+  function brochureId(lic) { return lic && (C.programs || []).some(function (p) { return p.id === lic; }) ? lic : "general"; }
+  function brochureMini(lic) { return BROCHURE.dir + brochureId(lic) + "-b-mini.webp"; }
+  function loadImg(url) {
+    return new Promise(function (ok, ko) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = function () { ko(new Error("no se pudo cargar " + url)); }; i.src = url; });
+  }
+  function composeBack(lic, url) {
+    return loadImg(BROCHURE.dir + brochureId(lic) + "-b.jpg").then(function (img) {
+      var c = document.createElement("canvas"); c.width = img.naturalWidth; c.height = img.naturalHeight;
+      var g = c.getContext("2d"), q = BROCHURE.qr, d = document.createElement("div");
+      g.drawImage(img, 0, 0);
+      g.fillStyle = BROCHURE.paper; g.fillRect(q[0] - 2, q[1] - 2, q[2] + 4, q[2] + 4);
+      new QRCode(d, { text: url, width: q[2] * 4, height: q[2] * 4, correctLevel: QRCode.CorrectLevel.M, colorDark: BROCHURE.ink, colorLight: BROCHURE.paper });
+      g.imageSmoothingEnabled = false;
+      g.drawImage(d.querySelector("canvas"), q[0], q[1], q[2], q[2]);
+      return c;
+    });
+  }
+  // un PDF con cara A + cara B (con el QR nuevo) por cada folleto de la lista [{lic, url}]
+  function brochurePdf(items, filename) {
+    var J = window.jspdf && window.jspdf.jsPDF;
+    if (!J) return Promise.reject(new Error("no cargó el generador de PDF; revisa la conexión"));
+    var P = BROCHURE.page, pdf = new J({ unit: "pt", format: P }), chain = Promise.resolve();
+    items.forEach(function (it, i) {
+      chain = chain.then(function () {
+        return Promise.all([loadImg(BROCHURE.dir + brochureId(it.lic) + "-a.jpg"), composeBack(it.lic, it.url)]);
+      }).then(function (r) {
+        if (i) pdf.addPage(P);
+        pdf.addImage(r[0], "JPEG", 0, 0, P[0], P[1]);
+        pdf.addPage(P);
+        pdf.addImage(r[1].toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, P[0], P[1]);
+      });
+    });
+    return chain.then(function () { pdf.save(filename + ".pdf"); });
+  }
+  // los folletos se imprimen: su QR siempre apunta al sitio público, aunque el panel se abra en localhost
+  var PUBLIC_BASE = "https://luyder.github.io/faceduc-qr/";
+  function printBase() { var b = $("#qBase").value.trim(); return !b || /^https?:\/\/(localhost|127\.0\.0\.1)|TU-USUARIO|TU-REPO/.test(b) ? PUBLIC_BASE : b; }
+  function busy(btn, p) {
+    var old = btn.textContent; btn.disabled = true; btn.textContent = "Generando…";
+    return p.catch(function (err) { alert("No se pudo generar el folleto: " + err.message); })
+      .then(function () { btn.disabled = false; btn.textContent = old; });
   }
 
   function buildQR() {
@@ -1226,14 +1275,15 @@
     function buildAll() {
       grid.textContent = "";
       (C.sources || []).forEach(function (s) {
-        var info = srcInfo(s.id);
+        var info = srcInfo(s.id), lic = qAllLic.value;
+        var bLic = s.id === "folleto-general" ? "" : lic;   // el folleto general siempre es el general, sin licenciatura
+        if (isBrochure(s)) info.image = brochureMini(bLic);
         var item = el("div", "qr-item"), mini = el("div", "mini"), meta = el("div", "meta"), box = el("div", "qrbox");
         mini.appendChild(originVisual(info, { hint: " " }));
         item.appendChild(mini);
         meta.appendChild(el("span", "eyebrow", info.type));
         meta.appendChild(el("strong", null, s.label));
         if (info.place) meta.appendChild(el("span", "o-place", info.place));
-        var lic = qAllLic.value;
         meta.appendChild(el("code", null, (lic ? "?lic=" + lic + "&" : "?") + "src=" + s.id));
         var row = el("div", "row");
         row.appendChild(box);
@@ -1241,6 +1291,13 @@
         var cap = [lic ? "Lic. en " + licLabel(lic) : "", s.label].filter(Boolean).join(" · ");
         b.addEventListener("click", function () { downloadQR(box, cap, "qr-" + (lic ? lic + "-" : "") + s.id); });
         row.appendChild(b);
+        if (isBrochure(s)) {
+          var fb = el("button", "btn small primary", "Folleto con QR (PDF)");
+          fb.addEventListener("click", function () {
+            busy(fb, brochurePdf([{ lic: bLic, url: buildUrl(printBase(), s.id, "", "", bLic) }], "folleto-" + brochureId(bLic) + "-" + s.id));
+          });
+          row.appendChild(fb);
+        }
         meta.appendChild(row);
         item.appendChild(meta);
         grid.appendChild(item);
@@ -1250,5 +1307,57 @@
     $("#qBase").addEventListener("change", buildAll);
     qAllLic.addEventListener("change", buildAll);
     buildAll();
+    window.__qrRebuild = function () {
+      var keep = qSrc.value;
+      [].slice.call(qSrc.options).forEach(function (o) { if (o.value && o.value !== "__custom") o.remove(); });
+      (C.sources || []).forEach(function (s) { var o = el("option", null, s.label + "  (" + s.id + ")"); o.value = s.id; qSrc.insertBefore(o, oc); });
+      if ([].some.call(qSrc.options, function (o) { return o.value === keep; })) qSrc.value = keep;
+      update();
+      buildAll();
+      renderEvent();
+    };
+
+    // ---------- nuevo evento de folleto ----------
+    function eventId(name) {
+      return String(name || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
+    }
+    function eventItems(id) {
+      var base = printBase();
+      return (C.programs || []).map(function (p) { return { lic: p.id, name: "Licenciatura en " + p.name, url: buildUrl(base, id, "", "", p.id) }; })
+        .concat([{ lic: "", name: "Folleto general", url: buildUrl(base, id, "", "", "") }]);
+    }
+    function renderEvent() {
+      var name = $("#evName").value.trim(), id = eventId(name), grid = $("#evGrid");
+      $("#evId").textContent = id || "—";
+      $("#evAll").disabled = $("#evSave").disabled = !id;
+      grid.textContent = "";
+      if (!id) return;
+      var known = lookup(C.sources, id);
+      $("#evStatus").textContent = known ? "Ya está registrado en el panel como «" + known.label + "»." : "Los QR funcionan desde ya; registrarlo hace que el panel muestre el nombre del evento.";
+      eventItems(id).forEach(function (it) {
+        var card = el("div", "ev-item"), img = el("img");
+        img.src = brochureMini(it.lic); img.alt = "Folleto " + it.name;
+        card.appendChild(img);
+        card.appendChild(el("strong", null, it.name));
+        var b = el("button", "btn small", "PDF");
+        b.addEventListener("click", function () { busy(b, brochurePdf([it], "folleto-" + brochureId(it.lic) + "-" + id)); });
+        card.appendChild(b);
+        grid.appendChild(card);
+      });
+    }
+    $("#evName").addEventListener("input", renderEvent);
+    $("#evAll").addEventListener("click", function () {
+      var id = eventId($("#evName").value);
+      busy(this, brochurePdf(eventItems(id), "folletos-" + id));
+    });
+    $("#evSave").addEventListener("click", function () {
+      var name = $("#evName").value.trim(), id = eventId(name);
+      if (!id || !window.QREditor) return;
+      var r = QREditor.addSource({ id: id, label: name, type: "Folleto", place: "Evento: " + name, image: brochureMini("") });
+      $("#evStatus").textContent = r === "existe" ? "Ese ID ya existe en el panel; usa otro nombre o descarga los folletos tal cual."
+        : r === "bad" ? "No se pudo registrar: hay errores en Configurar (marcados con ✕). Corrígelos y vuelve a intentarlo."
+        : r === "download" ? "Se descargó config.js con el evento: súbelo al repositorio (o conecta GitHub en Configurar) para que el panel muestre el nombre."
+        : "Guardando el evento en la configuración… (se ve en Configurar ▸ Orígenes)";
+    });
   }
 })();
