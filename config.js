@@ -21,7 +21,7 @@ window.HUB_CONFIG = {
   endpoint: "https://script.google.com/macros/s/AKfycbxPsH5p2FENEF-7zvy7CEDdZKUtSvuqQVBsdQ9kJhN1DM0BdbcjL7udv4jbdW_r8tZhCg/exec",
 
   // Ubicación aproximada (país/ciudad) vía ipapi.co. No se guarda la IP.
-  geo: false,
+  geo: true,
 
   // Número de WhatsApp de asesoría (con indicativo, sin + ni espacios)
   whatsapp: "573103018445",
@@ -37,7 +37,7 @@ window.HUB_CONFIG = {
   fieldTrips: { show: true, eyebrow: "Cada semestre", title: "Salidas de campo", text: "Conoce las realidades del país", url: "salidas.html", tourUrl: "https://luyder.github.io/Prueba3D1/", tourImage: "assets/recorrido-360.webp?v=2" },
 
   // Aviso breve de privacidad al pie de la página
-  privacyNote: "Registramos datos anónimos de visita (dispositivo, origen y enlace elegido) para mejorar nuestros servicios. No guardamos datos personales.",
+  privacyNote: "Registramos datos anónimos de visita (dispositivo, ciudad aproximada, origen y enlace elegido) para mejorar nuestros servicios. No guardamos tu IP ni datos personales.",
 
   // Licenciaturas: cada una es un nodo propio (?lic=ID).
   //   id 🔒 fijo · name nombre tras «Licenciatura en» · color identidad · page página oficial · pensum plan de estudios
