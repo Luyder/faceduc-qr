@@ -37,7 +37,7 @@ window.HUB_CONFIG = {
   fieldTrips: { show: true, eyebrow: "Cada semestre", title: "Salidas de campo", text: "Conoce las realidades del país", url: "salidas.html", tourUrl: "https://luyder.github.io/Prueba3D1/", tourImage: "assets/recorrido-360.webp?v=2" },
 
   // Aviso breve de privacidad al pie de la página
-  privacyNote: "Registramos datos anónimos de visita (dispositivo, ciudad aproximada, origen y enlace elegido) para mejorar nuestros servicios. No guardamos tu IP ni datos personales.",
+  privacyNote: "Registramos datos de tu visita sin pedirte nombre ni correo: un identificador aleatorio guardado en este navegador, tu dispositivo, ciudad aproximada, de dónde llegaste y lo que abres aquí. Para estimar la ciudad, tu IP pasa por un servicio externo (ipapi.co); nosotros no la guardamos. No usamos cookies.",
 
   // Licenciaturas: cada una es un nodo propio (?lic=ID).
   //   id 🔒 fijo · name nombre tras «Licenciatura en» · color identidad · page página oficial · pensum plan de estudios
