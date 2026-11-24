@@ -21,7 +21,7 @@
   // algunas licenciaturas tienen dos mallas según el ingreso: data/<id>.js y data/<id>-<malla>.js
   function load(m, done) {
     var s = document.createElement("script");
-    s.src = "data/" + slug + (m ? "-" + m : "") + ".js?v=20261124b";
+    s.src = "data/" + slug + (m ? "-" + m : "") + ".js?v=20261124c";
     window.PENSUM = null;
     s.onload = function () {
       if (!window.PENSUM) { fail("El pensum no tiene datos."); return; }

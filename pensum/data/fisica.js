@@ -86,7 +86,7 @@ window.PENSUM = {
   {
    "id": "fisi1502",
    "short": "Introd. a Física",
-   "name": "Introducción a a Física",
+   "name": "Introducción a la Física",
    "code": "FISI-1502",
    "credits": 3,
    "area": "disciplinar",
