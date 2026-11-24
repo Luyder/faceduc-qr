@@ -70,7 +70,7 @@ window.PENSUM = {
   {
    "id": "lite1100",
    "short": "Introd. a los estudios literarios",
-   "name": "Introducción a a los estudios literarios",
+   "name": "Introducción a los estudios literarios",
    "code": "LITE-1100",
    "credits": 3,
    "area": "disciplinar",

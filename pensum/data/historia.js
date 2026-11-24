@@ -70,7 +70,7 @@ window.PENSUM = {
   {
    "id": "hist1110",
    "short": "Introd. a la Historia",
-   "name": "Introducción a a la Historia",
+   "name": "Introducción a la Historia",
    "code": "HIST-1110",
    "credits": 3,
    "area": "disciplinar",
@@ -150,7 +150,7 @@ window.PENSUM = {
   {
    "id": "camb1115",
    "short": "Introd. a la Geografía",
-   "name": "Introducción a a la Geografía",
+   "name": "Introducción a la Geografía",
    "code": "CAMB-1115",
    "credits": 3,
    "area": "disciplinar",
