@@ -15,17 +15,47 @@
   var slug = (q.get("p") || "").toLowerCase();
   if (!/^[a-z0-9-]+$/.test(slug)) { fail("No se indicó qué pensum mostrar."); return; }
 
-  var s = document.createElement("script");
-  s.src = "data/" + slug + ".js?v=20261020n";
-  s.onload = function () { window.PENSUM ? init(window.PENSUM) : fail("El pensum no tiene datos."); };
-  s.onerror = function () { fail("Este pensum todavía no está disponible."); };
-  document.head.appendChild(s);
+  var malla = /^[a-z0-9-]+$/.test(q.get("malla") || "") ? q.get("malla") : "";
+  load(malla);
+
+  // algunas licenciaturas tienen dos mallas según el ingreso: data/<id>.js y data/<id>-<malla>.js
+  function load(m, done) {
+    var s = document.createElement("script");
+    s.src = "data/" + slug + (m ? "-" + m : "") + ".js?v=20261124a";
+    window.PENSUM = null;
+    s.onload = function () {
+      if (!window.PENSUM) { fail("El pensum no tiene datos."); return; }
+      if (done) done();
+      init(window.PENSUM);
+    };
+    s.onerror = function () { if (done) buildSwitch(); else fail("Este pensum todavía no está disponible."); };   // si falla el cambio, sigue la malla actual
+    document.head.appendChild(s);
+  }
+
+  // cambia de malla sin recargar (así no se registra otra visita)
+  function buildSwitch() {
+    var b = $("#malla"), o = P.otraMalla;
+    b.hidden = !o;
+    if (!o) return;
+    b.textContent = o.texto;
+    b.onclick = function () {
+      b.onclick = null;
+      load(o.malla, function () {
+        if (history.replaceState) {
+          var u = new URLSearchParams(location.search);
+          if (o.malla) u.set("malla", o.malla); else u.delete("malla");
+          history.replaceState(null, "", location.pathname + "?" + u);
+        }
+        byId = {}; after = {}; sem = 1; selected = null;
+      });
+    };
+  }
 
   function fail(msg) {
     $("#board").appendChild(el("p", "pen-error", msg));
   }
 
-  var P, byId = {}, after = {}, mobile = window.matchMedia("(max-width: 820px)"), sem = 1, selected = null;
+  var P, byId = {}, after = {}, mobile = window.matchMedia("(max-width: 820px)"), sem = 1, selected = null, started = false;
 
   function init(data) {
     P = data;
@@ -47,7 +77,9 @@
     buildTabs();
     buildBoard();
     buildNotes();
-    mobile.addEventListener ? mobile.addEventListener("change", applySem) : mobile.addListener(applySem);
+    buildSwitch();
+    if (!started) mobile.addEventListener ? mobile.addEventListener("change", applySem) : mobile.addListener(applySem);
+    started = true;
     applySem();
 
     // abrir un curso desde la URL (#educ2011)

@@ -70,7 +70,7 @@ window.PENSUM = {
   {
    "id": "fcie1010",
    "short": "Introd. a las ciencias",
-   "name": "Introducción a a las ciencias",
+   "name": "Introducción a las ciencias",
    "code": "FCIE-1010",
    "credits": 2,
    "area": "disciplinar",
@@ -164,18 +164,23 @@ window.PENSUM = {
    "kind": "curso"
   },
   {
-   "id": "mate1102",
-   "short": "Matemática Estructural",
-   "name": "Matemática Estructural",
-   "code": "MATE-1102",
+   "id": "educ2205",
+   "short": "Educación Matemática 1",
+   "name": "Educación Matemática 1",
+   "code": "EDUC-2205",
    "credits": 3,
    "area": "disciplinar",
    "sem": 2,
    "row": 1,
-   "desc": "Este curso ofrece una introducción formal a los fundamentos de las matemáticas, a través del estudio riguroso de conceptos centrales como teoría de conjuntos, teoría de números, relaciones, funciones y estructuras algebraicas elementales. Se abordan temas como operaciones conjuntistas, demostraciones por elementos, álgebra de conjuntos, principios de inducción y buen orden, así como aplicaciones al conteo. En teoría de números, se estudian la divisibilidad, el algoritmo de Euclides, los números primos, congruencias y teoremas clásicos como el pequeño teorema de Fermat y el teorema chino del residuo. También se exploran relaciones de equivalencia, órdenes, funciones y nociones de cardinalidad en conjuntos finitos e infinitos, incluyendo el teorema de Cantor-Schröder-Bernstein. Finalmente, se introducen elementos básicos de teoría de estructuras e isomorfismos, con una aproximación a los rudimentos de la teoría de grupos. El curso busca desarrollar habilidades de abstracción, demostración lógica y pensamiento estructurado fundamentales en la formación matemática.",
-   "pre": [],
+   "desc": "",
+   "pre": [
+    "mate1201"
+   ],
    "co": [],
-   "notes": [],
+   "notes": [
+    "Educación Matemática 1 requiere Precálculo.",
+    "Curso anual: se ofrece en 2027-1."
+   ],
    "link": null,
    "kind": "curso"
   },
@@ -189,7 +194,9 @@ window.PENSUM = {
    "sem": 2,
    "row": 2,
    "desc": "Funciones: álgebra de funciones, funciones trigonométricas, función exponencial, funciones inversas, logaritmos, inversas trigonométricas, principios de resolución de problemas.\nLímites y derivadas: velocidad y tangentes, límite de una función, cálculo de límites, continuidad, límites al infinito, razones de cambio, derivadas, la función derivada, reglas de derivación, derivadas de funciones trigonométricas, regla de cadena, derivación implícita, derivadas de logaritmos, derivadas de orden superior, funciones hiperbólicas.\nAplicaciones de las derivadas: razones relacionadas, máximos y mínimos, teorema del valor medio, derivadas y gráficas, regla de l'Hôpital, trazado de curvas, optimización.\nIntegrales: antiderivadas, áreas y distancia, integral definida, teorema fundamental del cálculo, integración por sustitución, áreas entre curvas, volúmenes de sólidos de rotación por los métodos de rebanadas y de conchas cilíndricas.\nPrerrequisito: PRECÁLCULO O MATE1 O MATS1",
-   "pre": [],
+   "pre": [
+    "mate1201"
+   ],
    "co": [],
    "notes": [],
    "link": null,
@@ -275,7 +282,9 @@ window.PENSUM = {
    "sem": 3,
    "row": 1,
    "desc": "Este curso es el segundo en la secuencia de formación básica en Cálculo iniciada en el curso de Cálculo Diferencial (MATE 1203), al final del cual ya se han introducido el concepto de anti-derivada, los teoremas fundamentales del cálculo y la técnica de integración por medio de sustitución de variables. El curso de Cálculo Integral con Ecuaciones Diferenciales parte de allí con el estudio de las técnicas básicas de integración en una variable y sus aplicaciones a problemas geométricos planteados en términos de curvas.\nAdemás introduce al estudiante al tema de series infinitas y a las técnicas más básicas de solución de ecuaciones diferenciales.\n\nPrerrequisito: CÁLCULO DIFERENCIAL\nCorrequisito: CALC.INTEG-ECUAC.DIFEREN COMPL",
-   "pre": [],
+   "pre": [
+    "mate1203"
+   ],
    "co": [],
    "notes": [],
    "link": null,
@@ -291,7 +300,9 @@ window.PENSUM = {
    "sem": 3,
    "row": 2,
    "desc": "En esta materia estudiamos estructuras lineales. En la primera parte del curso vamos a considerar sistemas de ecuaciones lineales y describir las estructuras posibles de sus soluciones. Para ello, veremos la conexión entre sistemas lineales y geometría lineal en los espacios R^n. Vamos a desarrollar métodos para decidir si un sistema lineal tiene solución única o no y vamos a conocer técnicas eficientes para encontrar las soluciones. Después vamos a abstraer las propiedades importantes de R^n e introducir espacios vectoriales abstractos y transformaciones lineales entre ellos. Un papel importante jugarán los conceptos de bases y dimensión de espacios vectoriales. Volveremos al estudio de R^n como espacio con producto interno que nos permite definir el concepto fundamental de ortogonalidad. Al final del curso hablaremos de valores y vectores propios de transformaciones lineales.\n\nPrerrequisito: CALCULO DIFERENCIAL",
-   "pre": [],
+   "pre": [
+    "mate1203"
+   ],
    "co": [],
    "notes": [],
    "link": null,
@@ -349,18 +360,21 @@ window.PENSUM = {
    "kind": "curso"
   },
   {
-   "id": "electivabasicade",
-   "short": "Electiva Básica de Matemáticas",
-   "name": "Electiva Básica de Matemáticas",
-   "code": "MATE-XXXX",
+   "id": "educ2206",
+   "short": "Educación Matemática 2",
+   "name": "Educación Matemática 2",
+   "code": "EDUC-2206",
    "credits": 3,
    "area": "disciplinar",
    "sem": 4,
    "row": 1,
-   "desc": "Cursos introductorios que acercan al estudiante al pensamiento matemático como herramienta de análisis lógico y estructurado. Estas electivas fomentan habilidades fundamentales para la argumentación rigurosa, el razonamiento abstracto y la comprensión de modelos formales aplicables en contextos educativos.",
+   "desc": "",
    "pre": [],
    "co": [],
-   "notes": [],
+   "notes": [
+    "Educación Matemática 2 no tiene prerrequisitos.",
+    "Curso anual: se ofrece en 2027-2."
+   ],
    "link": null,
    "kind": "curso"
   },
@@ -459,18 +473,21 @@ window.PENSUM = {
    "img": "img/EDUC-2201.webp"
   },
   {
-   "id": "mate1207",
-   "short": "Cálculo Vectorial",
-   "name": "Cálculo Vectorial",
-   "code": "MATE-1207",
+   "id": "educ2207",
+   "short": "Educación Matemática 3",
+   "name": "Educación Matemática 3",
+   "code": "EDUC-2207",
    "credits": 3,
    "area": "disciplinar",
    "sem": 5,
    "row": 2,
-   "desc": "Se comienza con las ecuaciones de planos, rectas, superficies cilíndricas y superficies cuádricas en 3D. A partir del concepto de vector se definen campos escalares, campos vectoriales y en general funciones vectoriales. Se tratan los principales temas del cálculo infinitesimal en varias variables como son límites, derivadas e integrales. Todo el curso está orientado para estudiar los teoremas fundamentales del cálculo vectorial: El teorema de Green, el teorema fundamental para integrales de línea, el teorema de Stokes y el teorema de Gauss. Como aplicaciones están: Optimización global; optimización restringida (multiplicadores de Lagrange); cálculo de masas, centros de masas y centroides; identificación de campos vectoriales conservativos; obtención de potenciales escalares; cálculo de trabajos y flujos.\n\nPrerrequisitos: ALGEBRA LÍNEAL Y ALGEBRA INTEGRAL",
+   "desc": "",
    "pre": [],
    "co": [],
-   "notes": [],
+   "notes": [
+    "Educación Matemática 3 requiere Educación Matemática 1 o 2.",
+    "Curso anual: se ofrece en 2028-1."
+   ],
    "link": null,
    "kind": "curso"
   },
@@ -781,5 +798,9 @@ window.PENSUM = {
    "img": "img/EDUC-3106.webp"
   }
  ],
- "source": "Plan de estudios vigente · descripciones tomadas del pensum interactivo oficial de la Facultad de Educación"
+ "source": "Plan de estudios para quienes ingresaron después de 202710 · descripciones tomadas del pensum interactivo oficial de la Facultad de Educación",
+ "otraMalla": {
+  "malla": "antes",
+  "texto": "Ver malla para quienes ingresaron antes de 202710"
+ }
 };

@@ -70,7 +70,7 @@ window.PENSUM = {
   {
    "id": "fcie1010",
    "short": "Introd. a las ciencias",
-   "name": "Introducción a a las ciencias",
+   "name": "Introducción a las ciencias",
    "code": "FCIE-1010",
    "credits": 2,
    "area": "disciplinar",
