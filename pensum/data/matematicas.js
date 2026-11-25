@@ -151,7 +151,7 @@ window.PENSUM = {
    "id": "educ1101",
    "short": "Teorías y retos del aprendizaje y su lab.",
    "name": "Teorías y retos del aprendizaje y su laboratorio",
-   "code": "EDUC-1101",
+   "code": "EDUC-1100",
    "credits": 4,
    "area": "pedagogia",
    "sem": 1,
@@ -161,7 +161,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-1100.webp"
   },
   {
    "id": "educ2205",
@@ -182,7 +183,8 @@ window.PENSUM = {
     "Curso anual: se ofrece en 2027-1."
    ],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2205.webp"
   },
   {
    "id": "mate1203",
@@ -341,13 +343,14 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2010.webp"
   },
   {
    "id": "educ4118",
    "short": "Desarrollo humano y educación",
    "name": "Desarrollo humano y educación",
-   "code": "EDUC-4118",
+   "code": "EDUC-2012",
    "credits": 4,
    "area": "pedagogia",
    "sem": 3,
@@ -357,7 +360,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2012.webp"
   },
   {
    "id": "educ2206",
@@ -376,7 +380,8 @@ window.PENSUM = {
     "Curso anual: se ofrece en 2027-2."
    ],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2206.webp"
   },
   {
    "id": "cbu3",
@@ -489,7 +494,8 @@ window.PENSUM = {
     "Curso anual: se ofrece en 2028-1."
    ],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2207.webp"
   },
   {
    "id": "cbu4",
@@ -548,7 +554,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2102.webp"
   },
   {
    "id": "educ2202",
@@ -588,7 +595,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2204.webp"
   },
   {
    "id": "cbu5",
@@ -697,7 +705,7 @@ window.PENSUM = {
    "area": "practicas",
    "sem": 7,
    "row": 2,
-   "desc": "Prerrequisito: Condición previa para poder cursar una materia. Ejemplo: Para tomar Investigación acción en el aula (EDUC-2011) es necesario haber cursado y aprobado el curso de Investigación en educación (EDUC-2007).\nCorrequisito: Condición para poder cursar una materia. En este caso, se deben cursar simultáneamente dos o más cursos. Ejemplo: Retos Pedagógicos de la disciplina 1 (EDUC-3131) se debe cursar simultáneamente con la Práctica profesional 1 (EDUC-3231).",
+   "desc": "Prerrequisito: Condición previa para poder cursar una materia. Ejemplo: Para tomar Investigación acción en el aula (EDUC-2011) es necesario haber cursado y aprobado el curso de Investigación en educación (EDUC-2007).\nCorrequisito: Condición para poder cursar una materia. En este caso, se deben cursar simultáneamente dos o más cursos. Ejemplo: Retos Pedagógicos de la disciplina 1 (EDUC-3103) se debe cursar simultáneamente con la Práctica profesional 1 (EDUC-3231).",
    "pre": [
     "educ2203",
     "educ2104",

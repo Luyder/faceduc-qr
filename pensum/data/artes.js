@@ -273,7 +273,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2010.webp"
   },
   {
    "id": "educ2011",
@@ -352,7 +353,7 @@ window.PENSUM = {
    "id": "educ4118",
    "short": "Desarrollo humano y educación",
    "name": "Desarrollo humano y educación",
-   "code": "EDUC-4118",
+   "code": "EDUC-2012",
    "credits": 4,
    "area": "pedagogia",
    "sem": 3,
@@ -362,7 +363,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2012.webp"
   },
   {
    "id": "educ1103",
@@ -414,7 +416,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2102.webp"
   },
   {
    "id": "educ2103",

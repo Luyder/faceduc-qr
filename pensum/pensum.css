@@ -20,9 +20,8 @@
 [hidden] { display: none !important; }
 html, body { margin: 0; background: var(--paper); }
 body { color: var(--ink); font: 14px/1.45 var(--sans); -webkit-font-smoothing: antialiased; }
-body.sheet-open { overflow: hidden; }
 
-.pen { max-width: 1400px; margin: 0 auto; padding: 28px 24px 40px; transition: margin .2s ease; }
+.pen { max-width: 1400px; margin: 0 auto; padding: 28px 24px 40px; }
 
 /* ---------- encabezado ---------- */
 .pen-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
@@ -119,7 +118,6 @@ body.sheet-open { overflow: hidden; }
   animation: sheet-in .2s ease-out;
 }
 @keyframes sheet-in { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
-@media (min-width: 1500px) { body.sheet-open .pen { margin-right: 450px; } }
 .sheet-head { position: relative; background: var(--bg); padding: 20px 56px 18px 22px; border-bottom: 2px solid var(--ac); }
 .sheet-area { margin: 0 0 6px; font: 600 11.5px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ac); }
 .sheet-head h2 { margin: 0; font: italic 600 26px/1.08 var(--serif); letter-spacing: -.015em; }
@@ -174,6 +172,7 @@ body.sheet-open { overflow: hidden; }
   .card.off, .band.empty, .row.sems { display: none; }
   .board.focus .card { opacity: .45; }
 
+  body.sheet-open { overflow: hidden; }
   .sheet-wrap { pointer-events: auto; background: rgba(20, 20, 20, .4); }
   .sheet { top: auto; left: 0; right: 0; bottom: 0; width: auto; max-height: 82vh; border-radius: 20px 20px 0 0; animation-name: sheet-up; }
   @keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -203,4 +202,27 @@ body.sheet-open { overflow: hidden; }
   }
   .card.has-img .c-cr { top: 12px; right: 12px; box-shadow: none; }
   .card.has-img .c-name::before { display: block; }
+}
+
+/* ---------- la ficha no tapa el pensum (escritorio y tablet) ---------- */
+/* pantalla ancha: el tablero se angosta y la ficha ocupa su propio espacio a la derecha */
+@media (min-width: 1360px) {
+  article.sheet { width: 370px; }
+  body.sheet-open .pen { margin-right: 386px; }
+  body.sheet-open .pen .row { grid-template-columns: 120px repeat(8, minmax(0, 1fr)); gap: 8px; }
+}
+/* pantalla mediana: la ficha va en una franja abajo y el pensum se sigue viendo y desplazando encima */
+@media (min-width: 821px) and (max-width: 1359px) {
+  body.sheet-open .pen { padding-bottom: calc(clamp(220px, 38vh, 360px) + 40px); }
+  article.sheet {
+    top: auto; left: 0; right: 0; bottom: 0; width: auto; height: clamp(220px, 38vh, 360px);
+    flex-direction: row; border-radius: 18px 18px 0 0; animation-name: sheet-up-md;
+    box-shadow: 0 -10px 30px rgba(20, 20, 20, .16), 0 0 0 1px rgba(20, 20, 20, .06);
+  }
+  @keyframes sheet-up-md { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+  article .sheet-media { width: 20%; aspect-ratio: auto; }
+  article .sheet-head { width: 27%; flex: none; position: static; overflow-y: auto; padding: 20px 20px 18px; border-bottom: 0; border-right: 2px solid var(--ac); }
+  article .sheet-head h2 { font-size: 22px; }
+  article .sheet-body { padding-right: 64px; }
+  article .sheet-close { z-index: 1; }
 }

@@ -168,7 +168,7 @@ window.PENSUM = {
    "id": "educ1111",
    "short": "Calidad de las interacciones en la primera infancia",
    "name": "Calidad de las interacciones en la primera infancia",
-   "code": "EDUC-1111",
+   "code": "EDUC-2018",
    "credits": 3,
    "area": "disciplinar",
    "sem": 2,
@@ -281,7 +281,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-1104.webp"
   },
   {
    "id": "cbu2",
@@ -316,13 +317,14 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2010.webp"
   },
   {
    "id": "educ4118",
    "short": "Desarrollo humano y educación",
    "name": "Desarrollo humano y educación",
-   "code": "EDUC-4118",
+   "code": "EDUC-2012",
    "credits": 4,
    "area": "pedagogia",
    "sem": 3,
@@ -332,7 +334,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2012.webp"
   },
   {
    "id": "educ2300",
@@ -348,7 +351,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2300.webp"
   },
   {
    "id": "cbu3",
@@ -448,7 +452,7 @@ window.PENSUM = {
    "id": "educ4121",
    "short": "Razonamiento lógico matemático en educación inicial",
    "name": "Razonamiento lógico matemático en educación inicial",
-   "code": "EDUC-4121",
+   "code": "EDUC-2021",
    "credits": 3,
    "area": "disciplinar",
    "sem": 5,
@@ -458,7 +462,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2021.webp"
   },
   {
    "id": "cbu4",
@@ -517,7 +522,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-2102.webp"
   },
   {
    "id": "educ2202",
@@ -557,7 +563,8 @@ window.PENSUM = {
    "co": [],
    "notes": [],
    "link": null,
-   "kind": "curso"
+   "kind": "curso",
+   "img": "img/EDUC-1113.webp"
   },
   {
    "id": "cbu5",
@@ -749,7 +756,7 @@ window.PENSUM = {
    "area": "practicas",
    "sem": 8,
    "row": 2,
-   "desc": "Prerrequisito: Condición previa para poder cursar una materia. Ejemplo: Para tomar Investigación acción en el aula (EDUC-2011) es necesario haber cursado y aprobado el curso de Investigación en educación (EDUC-2007).\nCorrequisito: Condición para poder cursar una materia. En este caso, se deben cursar simultáneamente dos o más cursos. Ejemplo: Retos Pedagógicos de la disciplina 1 (EDUC-3131) se debe cursar simultáneamente con la Práctica profesional 1 (EDUC-3231).",
+   "desc": "Prerrequisito: Condición previa para poder cursar una materia. Ejemplo: Para tomar Investigación acción en el aula (EDUC-2011) es necesario haber cursado y aprobado el curso de Investigación en educación (EDUC-2007).\nCorrequisito: Condición para poder cursar una materia. En este caso, se deben cursar simultáneamente dos o más cursos. Ejemplo: Retos Pedagógicos de la disciplina 1 (EDUC-3103) se debe cursar simultáneamente con la Práctica profesional 1 (EDUC-3231).",
    "pre": [
     "educ3105"
    ],

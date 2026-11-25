@@ -21,7 +21,7 @@
   // algunas licenciaturas tienen dos mallas según el ingreso: data/<id>.js y data/<id>-<malla>.js
   function load(m, done) {
     var s = document.createElement("script");
-    s.src = "data/" + slug + (m ? "-" + m : "") + ".js?v=20261124d";
+    s.src = "data/" + slug + (m ? "-" + m : "") + ".js?v=20261125h";
     window.PENSUM = null;
     s.onload = function () {
       if (!window.PENSUM) { fail("El pensum no tiene datos."); return; }
@@ -273,8 +273,21 @@
     wrap.hidden = false;
     body.scrollTop = 0;
     document.body.classList.add("sheet-open");
-    $("#sClose").focus();
+    sheet.setAttribute("aria-modal", mobile.matches);   // en escritorio la ficha convive con el pensum
+    reveal(id);
+    $("#sClose").focus({ preventScroll: true });
     if (history.replaceState) history.replaceState(null, "", "#" + id);
+  }
+
+  // deja el curso elegido en la parte visible del tablero (entre los semestres y la ficha)
+  function reveal(id) {
+    if (mobile.matches) return;
+    var n = document.querySelector('.card[data-id="' + id + '"]'), s = $("#sheet").getBoundingClientRect();
+    if (!n) return;
+    var r = n.getBoundingClientRect(), top = $(".sems").offsetHeight + 12;
+    var bottom = (window.innerWidth < 1360 ? window.innerHeight - s.height : window.innerHeight) - 12;
+    var dy = r.top < top ? r.top - top : r.bottom > bottom ? Math.min(r.bottom - bottom, r.top - top) : 0;
+    if (dy) window.scrollBy(0, dy);   // sin animación: un desplazamiento suave se puede interrumpir y dejar el curso cubierto
   }
 
   function group(body, title, ids, cls) {
@@ -301,10 +314,18 @@
     highlight(null);
     selected = null;
     if (history.replaceState) history.replaceState(null, "", location.pathname + location.search);
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
+    if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
   }
 
   $("#sClose").addEventListener("click", close);
-  $("#sheetWrap").addEventListener("click", function (e) { if (e.target === e.currentTarget) close(); });
+  // clic fuera de la ficha: se cierra; si el clic es en otro curso, la ficha cambia a ese curso.
+  // composedPath: al tocar un requisito la ficha se repinta y el botón ya no está en la página
+  var desdeFicha = false;   // al seleccionar texto y soltar afuera no se cierra
+  document.addEventListener("pointerdown", function (e) { desdeFicha = $("#sheet").contains(e.target); });
+  document.addEventListener("click", function (e) {
+    if (desdeFicha) { desdeFicha = false; return; }
+    var fuera = !e.composedPath().some(function (n) { return n.id === "sheet" || (n.classList && n.classList.contains("card")); });
+    if (fuera) close();
+  });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
 })();
